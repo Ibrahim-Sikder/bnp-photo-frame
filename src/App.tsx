@@ -148,6 +148,16 @@ export default function App() {
           box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         
+        .slider-orange::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ea580c;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          border: none;
+        }
+        
         .slider-teal::-webkit-slider-thumb {
           appearance: none;
           width: 24px;
@@ -158,18 +168,33 @@ export default function App() {
           box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         
+        .slider-teal::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #0d9488;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          border: none;
+        }
+        
         @media (max-width: 640px) {
           .slider-orange::-webkit-slider-thumb,
           .slider-teal::-webkit-slider-thumb {
             width: 28px;
             height: 28px;
           }
-        }
-           @media (max-width: 640px) {
-          .zoom-slider::-webkit-slider-thumb {
-            width: 24px;
-            height: 24px;
+          .slider-orange::-moz-range-thumb,
+          .slider-teal::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
           }
+        }
+
+        /* Ensure canvas is responsive */
+        canvas {
+          max-width: 100% !important;
+          height: auto !important;
         }
       `}} />
 
@@ -177,7 +202,7 @@ export default function App() {
       <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-3 md:py-6 px-4 text-center text-white shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
-          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="" />
+          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" />
         </div>
       </div>
 
@@ -200,7 +225,14 @@ export default function App() {
               <h2 className="text-sm sm:text-base font-bold bengali-text">২. ছবি আপলোড করুন 📷</h2>
             </div>
             <div className="p-3">
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="mobile-file-input"
+              />
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-5 sm:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-lg transition-all active:scale-95 touch-manipulation"
@@ -211,8 +243,8 @@ export default function App() {
             </div>
           </Card>
 
-          {/* Step 3: Preview - ALWAYS VISIBLE */}
-          <Card className="shadow-lg border-0 overflow-hidden">
+          {/* Step 3: Preview - ALWAYS VISIBLE ON MOBILE */}
+          <Card className="shadow-lg border-0 overflow-hidden bg-white">
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 text-white flex justify-between items-center">
               <h2 className="text-sm sm:text-base font-bold bengali-text">৩. প্রিভিউ 👁️</h2>
               {uploadedImage && (
@@ -257,7 +289,7 @@ export default function App() {
           {/* Step 4: Zoom Control - ONLY SHOW WHEN IMAGE UPLOADED */}
           {uploadedImage && (
             <>
-              <Card className="shadow-lg border-0 overflow-hidden">
+              <Card className="shadow-lg border-0 overflow-hidden bg-white">
                 <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-3 text-white">
                   <h2 className="text-sm sm:text-base font-bold bengali-text flex items-center gap-2">
                     <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -305,7 +337,7 @@ export default function App() {
               </Card>
 
               {/* Step 5: Position Control */}
-              <Card className="shadow-lg border-0 overflow-hidden">
+              <Card className="shadow-lg border-0 overflow-hidden bg-white">
                 <div className="bg-gradient-to-r from-teal-500 to-teal-600 p-3 text-white">
                   <h2 className="text-sm sm:text-base font-bold bengali-text flex items-center gap-2">
                     <Move className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -406,7 +438,8 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3 pb-4">
                 <Button
                   onClick={handleDownload}
-                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-6 sm:py-7 text-sm sm:text-base font-bold rounded-2xl shadow-lg transition-all active:scale-95 touch-manipulation"
+                  disabled={!uploadedImage}
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-6 sm:py-7 text-sm sm:text-base font-bold rounded-2xl shadow-lg transition-all active:scale-95 touch-manipulation disabled:opacity-50"
                 >
                   <Download className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
                   <span className="bengali-text">HD ডাউনলোড</span>
@@ -424,7 +457,7 @@ export default function App() {
         </div>
 
         {/* Desktop Layout: 6-6 Column Split */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block px-24">
           <div className="grid grid-cols-12 gap-6 items-start">
             {/* Left Panel - Controls (6 columns) */}
             <div className="col-span-6 w-full">
@@ -434,7 +467,14 @@ export default function App() {
                 </div>
                 <div className="p-6 space-y-5">
                   <div>
-                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="desktop-file-input"
+                    />
                     <Button
                       onClick={() => fileInputRef.current?.click()}
                       className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-6 text-lg font-semibold rounded-xl shadow-lg transition-all hover:scale-[1.02]"
@@ -541,7 +581,8 @@ export default function App() {
                       <div className="grid grid-cols-2 gap-3 pt-2">
                         <Button
                           onClick={handleDownload}
-                          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 font-bold rounded-lg shadow-md transition-all hover:shadow-lg"
+                          disabled={!uploadedImage}
+                          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 font-bold rounded-lg shadow-md transition-all hover:shadow-lg disabled:opacity-50"
                         >
                           <Download className="mr-2 h-5 w-5" /> HD ডাউনলোড
                         </Button>

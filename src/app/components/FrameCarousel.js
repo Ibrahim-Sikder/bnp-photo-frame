@@ -48,7 +48,17 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }) {
             });
         }
     };
-    return (_jsxs("div", { className: "relative w-full", children: [_jsxs("div", { className: "flex items-center gap-1", children: [canScrollLeft && (_jsx(Button, { onClick: () => scroll("left"), variant: "ghost", size: "sm", className: "flex-shrink-0 text-[#E41E3F] hover:bg-[#E41E3F]/10 z-10 rounded-full h-8 w-8 p-0 lg:h-9 lg:w-9", children: _jsx(ChevronLeft, { className: "h-4 w-4 lg:h-5 lg:w-5" }) })), _jsx("div", { ref: containerRef, className: "flex gap-2 overflow-x-auto scrollbar-hide flex-1 py-2", style: { scrollBehavior: "smooth", scrollbarWidth: "none", msOverflowStyle: "none" }, children: frames.map((frame) => (_jsxs("button", { onClick: () => onSelectFrame(frame.id), className: `relative flex-shrink-0 w-16 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 
+    return (_jsxs("div", { className: "relative w-full", children: [_jsx("style", { dangerouslySetInnerHTML: {
+                    __html: `
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `
+                } }), _jsxs("div", { className: "flex items-center gap-1", children: [canScrollLeft && (_jsx(Button, { onClick: () => scroll("left"), variant: "ghost", size: "sm", className: "flex-shrink-0 text-[#E41E3F] hover:bg-[#E41E3F]/10 z-10 rounded-full h-8 w-8 p-0 lg:h-9 lg:w-9", children: _jsx(ChevronLeft, { className: "h-4 w-4 lg:h-5 lg:w-5" }) })), _jsx("div", { ref: containerRef, className: "flex gap-2 overflow-x-auto scrollbar-hide flex-1 py-2", style: { scrollBehavior: "smooth" }, children: frames.map((frame) => (_jsxs("button", { onClick: () => onSelectFrame(frame.id), className: `relative flex-shrink-0 w-16 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 
                 sm:w-18 sm:h-22 
                 lg:w-20 lg:h-24 
                 ${selectedFrame === frame.id
@@ -59,9 +69,5 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }) {
                                                 target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' font-size='12' fill='%23999'%3E${frame.id}%3C/text%3E%3C/svg%3E`;
                                             } }) }) })] }, frame.id))) }), canScrollRight && (_jsx(Button, { onClick: () => scroll("right"), variant: "ghost", size: "sm", className: "flex-shrink-0 text-[#E41E3F] hover:bg-[#E41E3F]/10 z-10 rounded-full h-8 w-8 p-0 lg:h-9 lg:w-9", children: _jsx(ChevronRight, { className: "h-4 w-4 lg:h-5 lg:w-5" }) }))] }), _jsx("div", { className: "flex justify-center items-center gap-1.5 mt-2", children: frames.map((frame) => (_jsx("button", { onClick: () => onSelectFrame(frame.id), className: `h-1.5 rounded-full transition-all duration-300 ${selectedFrame === frame.id
                         ? "bg-[#E41E3F] w-6"
-                        : "bg-gray-300 hover:bg-gray-400 w-1.5"}`, "aria-label": `Select ${frame.id}` }, frame.id))) }), _jsx("style", { children: `
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      ` })] }));
+                        : "bg-gray-300 hover:bg-gray-400 w-1.5"}`, "aria-label": `Select ${frame.id}` }, frame.id))) })] }));
 }

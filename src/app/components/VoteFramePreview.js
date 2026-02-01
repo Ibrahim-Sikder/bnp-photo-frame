@@ -88,7 +88,7 @@ export default function VoteFramePreview({ uploadedImage, selectedFrame, zoom, o
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         ctx.clip();
-        if (img) {
+        if (img && img.complete) {
             // Calculate scaling for "cover" behavior
             const diameter = radius * 2;
             const scale = Math.max(diameter / img.width, diameter / img.height);
@@ -111,9 +111,11 @@ export default function VoteFramePreview({ uploadedImage, selectedFrame, zoom, o
         }
         ctx.restore();
         // --- STEP 2: Draw Frame ON TOP ---
-        ctx.drawImage(frameImg, 0, 0, canvasWidth, canvasHeight);
+        if (frameImg.complete) {
+            ctx.drawImage(frameImg, 0, 0, canvasWidth, canvasHeight);
+        }
         // --- STEP 3: Optional subtle border ---
-        if (img) {
+        if (img && img.complete) {
             ctx.save();
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
@@ -123,14 +125,22 @@ export default function VoteFramePreview({ uploadedImage, selectedFrame, zoom, o
             ctx.restore();
         }
     };
-    return (_jsxs("div", { ref: containerRef, className: "flex flex-col items-center justify-center w-full", children: [_jsxs("div", { className: "relative w-full", children: [_jsx("canvas", { ref: canvasRef, width: 1200, height: 1200, className: "w-full rounded-lg md:rounded-xl shadow-2xl border-2 md:border-4 border-white ring-1 md:ring-2 ring-gray-200 bg-white", style: {
-                            display: "block",
-                            maxWidth: "100%",
-                            height: "auto",
-                            aspectRatio: "1",
-                        } }), !uploadedImage && (_jsx("div", { className: "absolute inset-0 flex items-center justify-center pointer-events-none", children: _jsxs("div", { className: "bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 m-4 max-w-sm text-center border-2 border-gray-200", children: [_jsx("div", { className: "w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#E41E3F] to-[#c41830] flex items-center justify-center shadow-lg", children: _jsx("svg", { className: "w-8 h-8 text-white", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" }) }) }), _jsx("h3", { className: "text-xl font-bold text-gray-800 mb-2 bengali-text", children: "\u099B\u09AC\u09BF \u0986\u09AA\u09B2\u09CB\u09A1 \u0995\u09B0\u09C1\u09A8" }), _jsx("p", { className: "text-sm text-gray-600 mb-4 bengali-text", children: "\u0986\u09AA\u09A8\u09BE\u09B0 \u099B\u09AC\u09BF \u09AF\u09C1\u0995\u09CD\u09A4 \u0995\u09B0\u09C7 \u09AB\u09CD\u09B0\u09C7\u09AE \u09A6\u09C7\u0996\u09C1\u09A8" }), _jsxs("div", { className: "space-y-2 text-xs text-gray-500", children: [_jsxs("div", { className: "flex items-center justify-center gap-2", children: [_jsx("svg", { className: "w-4 h-4 text-[#E41E3F]", fill: "currentColor", viewBox: "0 0 20 20", children: _jsx("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z", clipRule: "evenodd" }) }), _jsx("span", { className: "bengali-text", children: "\u099C\u09C1\u09AE \u0995\u09B0\u09A4\u09C7 \u09B8\u09CD\u0995\u09CD\u09B0\u09CB\u09B2 \u0995\u09B0\u09C1\u09A8" })] }), _jsxs("div", { className: "flex items-center justify-center gap-2", children: [_jsx("svg", { className: "w-4 h-4 text-[#007A5E]", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" }) }), _jsx("span", { className: "bengali-text", children: "\u099F\u09C7\u09A8\u09C7 \u09B8\u09B0\u09BE\u09A4\u09C7 \u09A1\u09CD\u09B0\u09CD\u09AF\u09BE\u0997 \u0995\u09B0\u09C1\u09A8" })] })] })] }) })), uploadedImage && (_jsx("div", { className: "absolute top-2 right-2 md:top-3 md:right-3 bg-black/70 text-white text-xs md:text-sm px-3 py-1.5 rounded-full backdrop-blur-sm shadow-lg", children: _jsxs("span", { className: "font-bold", children: [zoom, "%"] }) }))] }), _jsx("style", { children: `
+    return (_jsxs("div", { ref: containerRef, className: "flex flex-col items-center justify-center w-full", children: [_jsx("style", { dangerouslySetInnerHTML: {
+                    __html: `
         .bengali-text {
           font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
         }
-      ` })] }));
+        
+        /* Force canvas responsiveness on all devices */
+        .preview-canvas {
+          width: 100% !important;
+          height: auto !important;
+          max-width: 100% !important;
+          display: block !important;
+        }
+      `
+                } }), _jsxs("div", { className: "relative w-full", children: [_jsx("canvas", { ref: canvasRef, className: "preview-canvas w-full rounded-lg md:rounded-xl shadow-2xl border-2 md:border-4 border-white ring-1 md:ring-2 ring-gray-200 bg-white", style: {
+                            aspectRatio: "1 / 1",
+                            objectFit: "contain"
+                        } }), !uploadedImage && (_jsx("div", { className: "absolute inset-0 flex items-center justify-center pointer-events-none", children: _jsxs("div", { className: "bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-6 m-4 max-w-[280px] sm:max-w-sm text-center border-2 border-gray-200", children: [_jsx("div", { className: "w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br from-[#E41E3F] to-[#c41830] flex items-center justify-center shadow-lg", children: _jsx("svg", { className: "w-6 h-6 sm:w-8 sm:h-8 text-white", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" }) }) }), _jsx("h3", { className: "text-lg sm:text-xl font-bold text-gray-800 mb-2 bengali-text", children: "\u099B\u09AC\u09BF \u0986\u09AA\u09B2\u09CB\u09A1 \u0995\u09B0\u09C1\u09A8" }), _jsx("p", { className: "text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 bengali-text", children: "\u0986\u09AA\u09A8\u09BE\u09B0 \u099B\u09AC\u09BF \u09AF\u09C1\u0995\u09CD\u09A4 \u0995\u09B0\u09C7 \u09AB\u09CD\u09B0\u09C7\u09AE \u09A6\u09C7\u0996\u09C1\u09A8" }), _jsxs("div", { className: "space-y-2 text-xs text-gray-500", children: [_jsxs("div", { className: "flex items-center justify-center gap-2", children: [_jsx("svg", { className: "w-3 h-3 sm:w-4 sm:h-4 text-[#E41E3F]", fill: "currentColor", viewBox: "0 0 20 20", children: _jsx("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z", clipRule: "evenodd" }) }), _jsx("span", { className: "bengali-text text-xs", children: "\u099C\u09C1\u09AE \u0995\u09B0\u09A4\u09C7 \u09B8\u09CD\u0995\u09CD\u09B0\u09CB\u09B2 \u0995\u09B0\u09C1\u09A8" })] }), _jsxs("div", { className: "flex items-center justify-center gap-2", children: [_jsx("svg", { className: "w-3 h-3 sm:w-4 sm:h-4 text-[#007A5E]", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" }) }), _jsx("span", { className: "bengali-text text-xs", children: "\u099F\u09C7\u09A8\u09C7 \u09B8\u09B0\u09BE\u09A4\u09C7 \u09A1\u09CD\u09B0\u09CD\u09AF\u09BE\u0997 \u0995\u09B0\u09C1\u09A8" })] })] })] }) })), uploadedImage && (_jsx("div", { className: "absolute top-2 right-2 md:top-3 md:right-3 bg-black/70 text-white text-xs md:text-sm px-2 py-1 md:px-3 md:py-1.5 rounded-full backdrop-blur-sm shadow-lg", children: _jsxs("span", { className: "font-bold", children: [zoom, "%"] }) }))] })] }));
 }
