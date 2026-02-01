@@ -8,7 +8,7 @@ import { Button } from "./components/ui/button";
 import FrameCarousel from "./components/FrameCarousel";
 import { Card } from "./components/ui/card";
 
-export default function Home() {
+export default function App() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [selectedFrame, setSelectedFrame] = useState<"frame1" | "frame2" | "frame3" | "frame4" | "frame5">("frame1");
   const [zoom, setZoom] = useState(100);
