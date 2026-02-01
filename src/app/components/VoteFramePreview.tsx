@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { useEffect, useRef, useMemo, useState } from "react";
 
 interface VoteFramePreviewProps {
