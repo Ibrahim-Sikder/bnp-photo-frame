@@ -134,7 +134,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="container  mx-auto px-24 py-4 md:py-8">
+      <div className="container  mx-auto px-2 md:px-24  py-4 md:py-8">
         {/* Mobile Layout */}
         <div className="lg:hidden space-y-3">
           {/* Step Indicator - Mobile */}
