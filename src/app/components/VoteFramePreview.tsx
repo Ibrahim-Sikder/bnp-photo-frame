@@ -46,8 +46,8 @@ export default function VoteFramePreview({
       const frameImg = new Image();
       frameImg.crossOrigin = "anonymous";
 
-      // Using .png
-      frameImg.src = `/frames/${selectedFrame}.png`;
+      // Using .jpeg as per your file structure
+      frameImg.src = `/frames/${selectedFrame}.jpeg`;
 
       frameImg.onload = () => {
         if (isCancelled) return;
@@ -56,8 +56,7 @@ export default function VoteFramePreview({
 
       frameImg.onerror = () => {
         if (isCancelled) return;
-        console.warn("PNG failed, trying JPEG fallback");
-        frameImg.src = `/frames/${selectedFrame}.jpeg`;
+        console.warn("Frame failed to load");
       };
     };
 
@@ -77,20 +76,25 @@ export default function VoteFramePreview({
   ) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const centerX = 640;
-    const centerY = 700;
-
-    // FIX: Increased Radius from 360 to 370.
-    // This gives the image more space so it doesn't look "cut off" or shrink when moving.
+    // --- FIX 1: Correct Center Point ---
+    // Canvas width is 1080, so center is 540.
+    // Previously it was 640, which cut off the right side of the circle.
+    const centerX = 540;
+    const centerY = 700; // Shifted up slightly for profile look
     const radius = 470;
 
-    // --- STEP 1: Draw User Image (Bottom Layer / Low Z-Index) ---
+    // --- STEP 1: Draw Frame (Bottom Layer) ---
+    // Draw the frame first (background)
+    ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+
+    // --- STEP 2: Draw User Image (Top Layer, Clipped) ---
+    // Draw user photo ON TOP of the frame, but clipped to the circle.
     ctx.save();
 
     // Create Circular Clipping Path
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.clip();
+    ctx.clip(); // Everything after this is INSIDE the circle
 
     // Aspect Ratio Logic (Object Fit: Cover)
     const diameter = radius * 2;
@@ -100,15 +104,19 @@ export default function VoteFramePreview({
     const drawWidth = img.width * finalScale;
     const drawHeight = img.height * finalScale;
 
-    let posX = centerX - drawWidth / 2 + (offsetX * 1.5);
-    let posY = centerY - drawHeight / 2 + (offsetY * 1.5);
+    // Calculate Position
+    const posX = centerX - drawWidth / 2 + (offsetX * 1.5);
+    const posY = centerY - drawHeight / 2 + (offsetY * 1.5);
 
     ctx.drawImage(img, posX, posY, drawWidth, drawHeight);
     ctx.restore(); // Remove clip
 
-    // --- STEP 2: Draw Frame (Top Layer / High Z-Index) ---
-    // This ensures the frame is ALWAYS on top, preventing overflow visually.
-    ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+    // --- Optional: Draw a thin border around the circle for clean edge ---
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.stroke();
   };
 
   return (
@@ -123,7 +131,7 @@ export default function VoteFramePreview({
                 display: "block",
                 aspectRatio: "1080/1350",
                 maxHeight: "500px",
-                minWidth: '500px'
+                minWidth: '300px'
               }}
             />
             <div className="mt-3 text-center">

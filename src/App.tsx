@@ -2,9 +2,9 @@
 
 import { useState, useRef } from "react";
 import { Upload, Download, RotateCcw } from "lucide-react";
-import VoteFramePreview from "./components/VoteFramePreview";
+import VoteFramePreview from "./app/components/VoteFramePreview";
 import { Button } from "./components/ui/button";
-import FrameCarousel from "./components/FrameCarousel";
+import FrameCarousel from "./app/components/FrameCarousel";
 import { Card } from "./components/ui/card";
 
 export default function App() {
@@ -70,8 +70,8 @@ export default function App() {
     if (!canvasRef.current || !uploadedImage) return;
     const canvas = canvasRef.current;
     const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png", 1.0);
-    link.download = `bnp-vote-frame-${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/jpeg", 1.0);
+    link.download = `bnp-vote-frame-${Date.now()}.jpeg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -90,7 +90,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 pb-10">
       {/* Hero Header */}
       <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-8 px-4 text-center text-white shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.jpeg')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
           <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="object-contain" />
         </div>
