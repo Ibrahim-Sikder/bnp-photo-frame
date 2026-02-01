@@ -170,7 +170,7 @@ export default function App() {
       <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-3 md:py-6 px-4 text-center text-white shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
-          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="h-10 md:h-16 object-contain" />
+          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="object-contain" />
         </div>
       </div>
 
