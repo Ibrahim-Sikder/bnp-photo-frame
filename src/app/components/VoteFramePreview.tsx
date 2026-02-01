@@ -244,35 +244,7 @@ export default function VoteFramePreview({
           className="preview-canvas w-full rounded-lg md:rounded-xl shadow-2xl border-2 md:border-4 border-white ring-1 md:ring-2 ring-gray-200 bg-white"
         />
 
-        {/* Instruction Overlay - Only when no image */}
-        {!uploadedImage && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-6 m-4 max-w-[280px] sm:max-w-sm text-center border-2 border-gray-200">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br from-[#E41E3F] to-[#c41830] flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 bengali-text">ছবি আপলোড করুন</h3>
-              <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 bengali-text">আপনার ছবি যুক্ত করে ফ্রেম দেখুন</p>
 
-              <div className="space-y-2 text-xs text-gray-500">
-                <div className="flex items-center justify-center gap-2">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 text-[#E41E3F]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-                  </svg>
-                  <span className="bengali-text text-xs">জুম করতে স্ক্রোল করুন</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 text-[#007A5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                  </svg>
-                  <span className="bengali-text text-xs">টেনে সরাতে ড্র্যাগ করুন</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Zoom Badge - Only when image uploaded */}
         {uploadedImage && (
