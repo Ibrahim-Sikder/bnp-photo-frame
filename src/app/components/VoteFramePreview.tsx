@@ -172,6 +172,13 @@ export default function VoteFramePreview({
 
   return (
     <div ref={containerRef} className="flex flex-col items-center justify-center w-full">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .bengali-text {
+          font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
+        }
+      `}} />
+
       {/* Canvas - Always show with default frame */}
       <div className="relative w-full">
         <canvas
@@ -224,12 +231,6 @@ export default function VoteFramePreview({
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .bengali-text {
-          font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
-        }
-      `}</style>
     </div>
   );
 }

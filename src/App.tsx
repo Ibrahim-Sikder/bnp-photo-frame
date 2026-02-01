@@ -128,7 +128,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <style>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .bengali-text {
           font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
         }
@@ -164,13 +165,19 @@ export default function App() {
             height: 28px;
           }
         }
-      `}</style>
+           @media (max-width: 640px) {
+          .zoom-slider::-webkit-slider-thumb {
+            width: 24px;
+            height: 24px;
+          }
+        }
+      `}} />
 
       {/* Hero Header */}
       <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-3 md:py-6 px-4 text-center text-white shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
-          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="object-contain" />
+          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="" />
         </div>
       </div>
 
@@ -204,7 +211,7 @@ export default function App() {
             </div>
           </Card>
 
-          {/* Step 3: Preview */}
+          {/* Step 3: Preview - ALWAYS VISIBLE */}
           <Card className="shadow-lg border-0 overflow-hidden">
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 text-white flex justify-between items-center">
               <h2 className="text-sm sm:text-base font-bold bengali-text">৩. প্রিভিউ 👁️</h2>
@@ -247,7 +254,7 @@ export default function App() {
             )}
           </Card>
 
-          {/* Step 4: Zoom Control */}
+          {/* Step 4: Zoom Control - ONLY SHOW WHEN IMAGE UPLOADED */}
           {uploadedImage && (
             <>
               <Card className="shadow-lg border-0 overflow-hidden">

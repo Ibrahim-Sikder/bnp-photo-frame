@@ -62,6 +62,17 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
 
   return (
     <div className="relative w-full">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}} />
+
       <div className="flex items-center gap-1">
         {/* Left Scroll Button */}
         {canScrollLeft && (
@@ -79,7 +90,7 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
         <div
           ref={containerRef}
           className="flex gap-2 overflow-x-auto scrollbar-hide flex-1 py-2"
-          style={{ scrollBehavior: "smooth", scrollbarWidth: "none", msOverflowStyle: "none" }}
+          style={{ scrollBehavior: "smooth" }}
         >
           {frames.map((frame) => (
             <button
@@ -149,13 +160,6 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
           />
         ))}
       </div>
-
-      {/* Hide scrollbar */}
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 }
