@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 interface VoteFramePreviewProps {
   uploadedImage: string | null;
@@ -18,139 +18,210 @@ export default function VoteFramePreview({
   canvasRef,
 }: VoteFramePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const imageCache = useRef<{ [key: string]: HTMLImageElement }>({});
+  const frameCache = useRef<{ [key: string]: HTMLImageElement }>({});
 
-  useEffect(() => {
-    let isCancelled = false;
+  // Pre-load and cache the uploaded image to prevent flickering
+  const cachedUserImage = useMemo(() => {
+    if (!uploadedImage) return null;
 
-    if (!uploadedImage || !canvasRef.current) return;
+    if (!imageCache.current[uploadedImage]) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = uploadedImage;
+      imageCache.current[uploadedImage] = img;
+    }
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    return imageCache.current[uploadedImage];
+  }, [uploadedImage]);
 
-    canvas.width = 1080;
-    canvas.height = 1350;
+  // Pre-load and cache frame images
+  const cachedFrameImage = useMemo(() => {
+    const frameKey = `/frames/${selectedFrame}.png`;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Load User Image
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = uploadedImage;
-
-    img.onload = () => {
-      if (isCancelled) return;
-
-      // Load Frame Image
+    if (!frameCache.current[frameKey]) {
       const frameImg = new Image();
       frameImg.crossOrigin = "anonymous";
+      frameImg.src = frameKey;
+      frameCache.current[frameKey] = frameImg;
+    }
 
-      // Using .jpeg as per your file structure
-      frameImg.src = `/frames/${selectedFrame}.jpeg`;
+    return frameCache.current[frameKey];
+  }, [selectedFrame]);
 
-      frameImg.onload = () => {
-        if (isCancelled) return;
-        drawCanvas(ctx, canvas, img, frameImg, zoom, offsetX, offsetY);
-      };
+  useEffect(() => {
+    if (!canvasRef.current || !cachedFrameImage) return;
 
-      frameImg.onerror = () => {
-        if (isCancelled) return;
-        console.warn("Frame failed to load");
-      };
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d", {
+      willReadFrequently: false,
+      alpha: true
+    });
+    if (!ctx) return;
+
+    // Larger canvas size for better quality - matching the uploaded images
+    canvas.width = 1200;
+    canvas.height = 1200;
+
+    const drawFrame = () => {
+      // Draw if frame is loaded (and user image if present)
+      if (cachedFrameImage.complete && (!uploadedImage || cachedUserImage?.complete)) {
+        drawCanvas(ctx, canvas, cachedUserImage, cachedFrameImage, zoom, offsetX, offsetY);
+      } else {
+        // Wait for images to load
+        const checkAndDraw = () => {
+          if (cachedFrameImage.complete && (!uploadedImage || cachedUserImage?.complete)) {
+            drawCanvas(ctx, canvas, cachedUserImage, cachedFrameImage, zoom, offsetX, offsetY);
+          }
+        };
+
+        if (uploadedImage && cachedUserImage && !cachedUserImage.complete) {
+          cachedUserImage.onload = checkAndDraw;
+        }
+        if (!cachedFrameImage.complete) {
+          cachedFrameImage.onload = checkAndDraw;
+        }
+      }
     };
+
+    // Use requestAnimationFrame for smoother rendering
+    const rafId = requestAnimationFrame(drawFrame);
 
     return () => {
-      isCancelled = true;
+      cancelAnimationFrame(rafId);
     };
-  }, [uploadedImage, selectedFrame, zoom, offsetX, offsetY, canvasRef]);
+  }, [uploadedImage, selectedFrame, zoom, offsetX, offsetY, canvasRef, cachedUserImage, cachedFrameImage]);
 
   const drawCanvas = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
-    img: HTMLImageElement,
+    img: HTMLImageElement | null,
     frameImg: HTMLImageElement,
     zoom: number,
     offsetX: number,
     offsetY: number
   ) => {
+    // Clear canvas completely (important for transparency)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // --- FIX 1: Correct Center Point ---
-    // Canvas width is 1080, so center is 540.
-    // Previously it was 640, which cut off the right side of the circle.
-    const centerX = 540;
-    const centerY = 700; // Shifted up slightly for profile look
-    const radius = 470;
+    // Canvas dimensions
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
 
-    // --- STEP 1: Draw Frame (Bottom Layer) ---
-    // Draw the frame first (background)
-    ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+    // Circle dimensions - bigger and properly centered
+    const centerX = canvasWidth / 2; // 600
+    const centerY = canvasHeight / 2; // 600
+    const radius = 540; // Much bigger circle (90% of canvas)
 
-    // --- STEP 2: Draw User Image (Top Layer, Clipped) ---
-    // Draw user photo ON TOP of the frame, but clipped to the circle.
-    ctx.save();
+    // --- STEP 1: Draw User Image FIRST (Background) ---
+    if (img) {
+      ctx.save();
 
-    // Create Circular Clipping Path
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.clip(); // Everything after this is INSIDE the circle
+      // Create circular clipping path
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.clip();
 
-    // Aspect Ratio Logic (Object Fit: Cover)
-    const diameter = radius * 2;
-    const scale = Math.max(diameter / img.width, diameter / img.height);
-    const finalScale = scale * (zoom / 100);
+      // Calculate scaling for "cover" behavior
+      const diameter = radius * 2;
+      const scale = Math.max(diameter / img.width, diameter / img.height);
+      const finalScale = scale * (zoom / 100);
 
-    const drawWidth = img.width * finalScale;
-    const drawHeight = img.height * finalScale;
+      const drawWidth = img.width * finalScale;
+      const drawHeight = img.height * finalScale;
 
-    // Calculate Position
-    const posX = centerX - drawWidth / 2 + (offsetX * 1.5);
-    const posY = centerY - drawHeight / 2 + (offsetY * 1.5);
+      // Calculate position with offset
+      const posX = centerX - drawWidth / 2 + (offsetX * 2.5);
+      const posY = centerY - drawHeight / 2 + (offsetY * 2.5);
 
-    ctx.drawImage(img, posX, posY, drawWidth, drawHeight);
-    ctx.restore(); // Remove clip
+      // Enable high-quality image smoothing
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
 
-    // --- Optional: Draw a thin border around the circle for clean edge ---
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.stroke();
+      // Draw user image
+      ctx.drawImage(img, posX, posY, drawWidth, drawHeight);
+      ctx.restore();
+    } else {
+      // If no image, show white circle background
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // --- STEP 2: Draw Frame ON TOP (Foreground with transparency) ---
+    // The frame PNG has transparency in the circle area
+    ctx.drawImage(frameImg, 0, 0, canvasWidth, canvasHeight);
+
+    // --- STEP 3: Optional subtle inner shadow for depth ---
+    if (img) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.stroke();
+      ctx.restore();
+    }
   };
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center justify-center bg-gray-100 rounded-xl p-2">
-      {uploadedImage ? (
-        <div className="w-full flex flex-col items-center">
-          <div className="relative w-full max-w-md">
-            <canvas
-              ref={canvasRef}
-              className="z-50 w-full h-auto rounded-lg shadow-2xl border-4 border-white"
-              style={{
-                display: "block",
-                aspectRatio: "1080/1350",
-                maxHeight: "500px",
-                minWidth: '300px'
-              }}
-            />
-            <div className="mt-3 text-center">
-              <p className="text-sm font-bold text-gray-700 bengali-text">
-                প্রিভিউ: {selectedFrame.replace('frame', 'ফ্রেম ')}
-              </p>
-              <p className="text-xs text-gray-500">রেজোলিউশন: ১০৮০ × ১৩৫০ পিক্সেল (HD)</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="text-center py-5 px-4 text-gray-500 w-full bg-white rounded-lg border-2 border-dashed border-gray-300">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
-            <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div ref={containerRef} className="flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3">
+      {!uploadedImage ? (
+        <div className="text-center py-8 px-4 text-gray-500 w-full bg-white rounded-lg border-2 border-dashed border-gray-300 max-w-2xl">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+            <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-lg bengali-text font-semibold text-gray-700">ছবি আপলোড করুন</p>
-          <p className="text-sm text-gray-400 bengali-text mt-1">আপনার ছবি এখানে আপলোড করে ফ্রেম প্রিভিউ দেখুন</p>
+          <p className="text-xl bengali-text font-semibold text-gray-700 mb-2">ছবি আপলোড করুন</p>
+          <p className="text-sm text-gray-400 bengali-text">আপনার ছবি আপলোড করে ফ্রেম প্রিভিউ দেখুন</p>
+          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            <span>মাউস স্ক্রোল করে জুম • ড্র্যাগ করে সরান</span>
+          </div>
+        </div>
+      ) : (
+        <div className="w-full flex flex-col items-center">
+          <div className="relative w-full max-w-2xl">
+            <canvas
+              ref={canvasRef}
+              className="w-full h-auto rounded-xl shadow-2xl border-4 border-white"
+              style={{
+                display: "block",
+                aspectRatio: "1/1",
+                imageRendering: "auto",
+                // Prevent flickering with GPU acceleration
+                transform: "translateZ(0)",
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+              }}
+            />
+            <div className="mt-4 text-center">
+              <p className="text-base font-bold text-gray-700 bengali-text mb-1">
+                প্রিভিউ: {selectedFrame.replace('frame', 'ফ্রেম ')}
+              </p>
+              <p className="text-xs text-gray-500">রেজোলিউশন: ১২০০ × ১২০০ পিক্সেল (HD)</p>
+              <div className="flex items-center justify-center gap-3 mt-2 text-xs text-gray-400">
+                <div className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span>স্ক্রোল করুন</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                  </svg>
+                  <span>ড্র্যাগ করুন</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

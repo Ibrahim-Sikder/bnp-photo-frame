@@ -15,24 +15,23 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
   const frames = [
     {
       id: "frame1" as const,
-      // FIX: Changed filename from frame.jpeg to frame1.jpeg to match logic
-      imageUrl: "/frames/frame1.jpeg",
+      imageUrl: "/frames/frame1.png",
     },
     {
       id: "frame2" as const,
-      imageUrl: "/frames/frame2.jpeg",
+      imageUrl: "/frames/frame2.png",
     },
     {
       id: "frame3" as const,
-      imageUrl: "/frames/frame3.jpeg",
+      imageUrl: "/frames/frame3.png",
     },
     {
       id: "frame4" as const,
-      imageUrl: "/frames/frame4.jpeg",
+      imageUrl: "/frames/frame4.png",
     },
     {
       id: "frame5" as const,
-      imageUrl: "/frames/frame5.jpeg",
+      imageUrl: "/frames/frame5.png",
     },
   ];
 

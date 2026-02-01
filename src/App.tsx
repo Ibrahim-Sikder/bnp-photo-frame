@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Download, RotateCcw } from "lucide-react";
+import { Upload, Download, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import VoteFramePreview from "./app/components/VoteFramePreview";
 import { Button } from "./components/ui/button";
 import FrameCarousel from "./app/components/FrameCarousel";
@@ -9,7 +9,7 @@ import { Card } from "./components/ui/card";
 
 export default function App() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [selectedFrame, setSelectedFrame] = useState<"frame1" | "frame2" | "frame3" | "frame4" | "frame5">("frame1");
+  const [selectedFrame, setSelectedFrame] = useState<"frame1" | "frame2" | "frame3" | "frame4" | "frame5">("frame3");
   const [zoom, setZoom] = useState(100);
   const [offsetX, setOffsetX] = useState(0);
   const [offsetY, setOffsetY] = useState(0);
@@ -43,35 +43,54 @@ export default function App() {
     if (!isDragging || !uploadedImage) return;
     const deltaX = clientX - dragStart.x;
     const deltaY = clientY - dragStart.y;
-    const sensitivity = 0.4;
+    const sensitivity = 1.2;
 
-    setOffsetX((prev) => Math.max(-100, Math.min(100, prev + deltaX * sensitivity)));
-    setOffsetY((prev) => Math.max(-100, Math.min(100, prev + deltaY * sensitivity)));
+    setOffsetX((prev) => Math.max(-200, Math.min(200, prev + deltaX * sensitivity)));
+    setOffsetY((prev) => Math.max(-200, Math.min(200, prev + deltaY * sensitivity)));
     setDragStart({ x: clientX, y: clientY });
   };
 
   const stopDrag = () => setIsDragging(false);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => startDrag(e.clientX, e.clientY);
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => moveDrag(e.clientX, e.clientY);
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    startDrag(e.clientX, e.clientY);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    moveDrag(e.clientX, e.clientY);
+  };
+
   const handleMouseUp = stopDrag;
+
+  // Mouse wheel zoom
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (!uploadedImage) return;
+    e.preventDefault();
+
+    const delta = e.deltaY > 0 ? -5 : 5;
+    setZoom((prev) => Math.max(50, Math.min(400, prev + delta)));
+  };
+
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     const touch = e.touches[0];
     startDrag(touch.clientX, touch.clientY);
   };
+
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (isDragging) e.preventDefault();
     const touch = e.touches[0];
     moveDrag(touch.clientX, touch.clientY);
   };
+
   const handleTouchEnd = stopDrag;
 
   const handleDownload = () => {
     if (!canvasRef.current || !uploadedImage) return;
     const canvas = canvasRef.current;
     const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/jpeg", 1.0);
-    link.download = `bnp-vote-frame-${Date.now()}.jpeg`;
+    link.href = canvas.toDataURL("image/png", 1.0);
+    link.download = `bnp-vote-frame-${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -79,28 +98,174 @@ export default function App() {
 
   const handleReset = () => {
     setUploadedImage(null);
-    setSelectedFrame("frame1");
+    setSelectedFrame("frame3");
     setZoom(100);
     setOffsetX(0);
     setOffsetY(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(400, prev + 10));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(50, prev - 10));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
       {/* Hero Header */}
-      <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-8 px-4 text-center text-white shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.jpeg')] opacity-10"></div>
+      <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-6 px-4 text-center text-white shadow-md relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
-          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="object-contain" />
+          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="h-16 object-contain" />
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Panel */}
-          <div className="lg:col-span-5 w-full">
-            <Card className="shadow-xl border-0 overflow-hidden">
+        {/* Mobile Layout: Preview on Top, Controls on Bottom */}
+        <div className="lg:hidden space-y-6">
+          {/* Preview Section - Top on Mobile */}
+          <Card className="shadow-xl border-0 overflow-hidden">
+            <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-4 text-white flex justify-between items-center">
+              <h2 className="text-lg font-bold bengali-text">প্রিভিউ</h2>
+              <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90">Live View</span>
+            </div>
+            <div className="bg-[#f8fafc] p-4 flex items-center justify-center">
+              <div
+                className={`w-full transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onWheel={handleWheel}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <VoteFramePreview
+                  uploadedImage={uploadedImage}
+                  selectedFrame={selectedFrame}
+                  zoom={zoom}
+                  offsetX={offsetX}
+                  offsetY={offsetY}
+                  canvasRef={canvasRef}
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Controls Section - Bottom on Mobile */}
+          <Card className="shadow-xl border-0 overflow-hidden sticky bottom-0 z-10 bg-white">
+            <div className="bg-[#E41E3F] p-4 text-white">
+              <h2 className="text-lg font-bold bengali-text">কন্ট্রোল প্যানেল</h2>
+            </div>
+            <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+              {!uploadedImage ? (
+                <div className="text-center py-4">
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  <Button onClick={() => fileInputRef.current?.click()} className="w-full bg-[#E41E3F] hover:bg-[#c41830] text-white py-6 text-base font-semibold rounded-xl shadow-lg transition-all hover:scale-[1.02]">
+                    <Upload className="mr-3 h-5 w-5" /> ছবি নির্বাচন করুন
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-800 mb-2 bengali-text border-l-4 border-[#E41E3F] pl-2">ফ্রেম নির্বাচন করুন</h3>
+                    <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+                  </div>
+
+                  <div className="space-y-4 pt-2">
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-bold text-gray-700 bengali-text">জুম করুন</label>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleZoomOut}
+                            className="h-8 w-8 p-0"
+                          >
+                            <ZoomOut className="h-4 w-4" />
+                          </Button>
+                          <span className="text-xs font-mono bg-gray-200 px-3 py-1 rounded text-gray-700 min-w-[60px] text-center">{zoom}%</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleZoomIn}
+                            className="h-8 w-8 p-0"
+                          >
+                            <ZoomIn className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min="50"
+                        max="400"
+                        step="1"
+                        value={zoom}
+                        onChange={(e) => setZoom(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>50%</span>
+                        <span>400%</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">অনুভূমিক অবস্থান (X)</label>
+                      <input
+                        type="range"
+                        min="-200"
+                        max="200"
+                        step="1"
+                        value={offsetX}
+                        onChange={(e) => setOffsetX(Number(e.target.value))}
+                        className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">উল্লম্ব অবস্থান (Y)</label>
+                      <input
+                        type="range"
+                        min="-200"
+                        max="200"
+                        step="1"
+                        value={offsetY}
+                        onChange={(e) => setOffsetY(Number(e.target.value))}
+                        className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p className="text-xs text-blue-800 bengali-text leading-relaxed">টিপ: প্রিভিউতে মাউস স্ক্রোল করে জুম করুন এবং ড্র্যাগ করে সরান।</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <Button onClick={handleDownload} className="bg-[#E41E3F] hover:bg-[#c41830] text-white py-3 font-bold rounded-lg shadow-md transition-all hover:shadow-lg">
+                      <Download className="mr-2 h-4 w-4" /> ডাউনলোড
+                    </Button>
+                    <Button onClick={handleReset} variant="outline" className="border-[#007A5E] text-[#007A5E] hover:bg-[#007A5E]/5 py-3 font-bold rounded-lg">
+                      <RotateCcw className="mr-2 h-4 w-4" /> নতুন
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Desktop Layout: Side by Side */}
+        <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start">
+          {/* Left Panel - Controls */}
+          <div className="lg:col-span-6 w-full">
+            <Card className="shadow-xl border-0 overflow-hidden sticky top-6">
               <div className="bg-[#E41E3F] p-5 text-white">
                 <h2 className="text-xl font-bold bengali-text">কন্ট্রোল প্যানেল</h2>
               </div>
@@ -118,27 +283,78 @@ export default function App() {
                       <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-2">ফ্রেম নির্বাচন করুন</h3>
                       <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
                     </div>
+
                     <div className="space-y-5 pt-2">
                       <div>
-                        <div className="flex justify-between mb-2">
+                        <div className="flex justify-between items-center mb-2">
                           <label className="text-sm font-bold text-gray-700 bengali-text">জুম করুন</label>
-                          <span className="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded text-gray-700">{zoom}%</span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleZoomOut}
+                              className="h-8 w-8 p-0"
+                            >
+                              <ZoomOut className="h-4 w-4" />
+                            </Button>
+                            <span className="text-xs font-mono bg-gray-200 px-3 py-1 rounded text-gray-700 min-w-[60px] text-center">{zoom}%</span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleZoomIn}
+                              className="h-8 w-8 p-0"
+                            >
+                              <ZoomIn className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <input type="range" min="50" max="250" step="1" value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]" />
+                        <input
+                          type="range"
+                          min="50"
+                          max="400"
+                          step="1"
+                          value={zoom}
+                          onChange={(e) => setZoom(Number(e.target.value))}
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <span>50%</span>
+                          <span>400%</span>
+                        </div>
                       </div>
+
                       <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">অনুভূমিক অবস্থান (X)</label>
-                        <input type="range" min="-100" max="100" value={offsetX} onChange={(e) => setOffsetX(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]" />
+                        <input
+                          type="range"
+                          min="-200"
+                          max="200"
+                          step="1"
+                          value={offsetX}
+                          onChange={(e) => setOffsetX(Number(e.target.value))}
+                          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                        />
                       </div>
+
                       <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">উল্লম্ব অবস্থান (Y)</label>
-                        <input type="range" min="-100" max="100" value={offsetY} onChange={(e) => setOffsetY(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]" />
+                        <input
+                          type="range"
+                          min="-200"
+                          max="200"
+                          step="1"
+                          value={offsetY}
+                          onChange={(e) => setOffsetY(Number(e.target.value))}
+                          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                        />
                       </div>
                     </div>
+
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-2">
                       <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      <p className="text-xs text-blue-800 bengali-text leading-relaxed">টিপ: আপনি প্রিভিউ ছবিতে আঙুল বা মাউস টেনে ছবি সরাতে পারেন।</p>
+                      <p className="text-xs text-blue-800 bengali-text leading-relaxed">টিপ: প্রিভিউতে মাউস স্ক্রোল করে জুম করুন এবং ড্র্যাগ করে সরান।</p>
                     </div>
+
                     <div className="grid grid-cols-2 gap-3 pt-2">
                       <Button onClick={handleDownload} className="bg-[#E41E3F] hover:bg-[#c41830] text-white py-3 font-bold rounded-lg shadow-md transition-all hover:shadow-lg">
                         <Download className="mr-2 h-4 w-4" /> ডাউনলোড
@@ -153,22 +369,40 @@ export default function App() {
             </Card>
           </div>
 
-          {/* Right Panel */}
-          <div className="lg:col-span-7 w-full">
-            <Card className="shadow-xl border-0 overflow-hidden sticky top-6">
+          {/* Right Panel - Preview */}
+          <div className="lg:col-span-6 w-full">
+            <Card className="shadow-xl border-0 overflow-hidden">
               <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-5 text-white flex justify-between items-center">
                 <h2 className="text-xl font-bold bengali-text">প্রিভিউ</h2>
                 <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90">Live View</span>
               </div>
-              <div className="bg-[#f8fafc]  flex items-center justify-center">
-                <div className={`w-full max-w-lg transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
-                  <VoteFramePreview uploadedImage={uploadedImage} selectedFrame={selectedFrame} zoom={zoom} offsetX={offsetX} offsetY={offsetY} canvasRef={canvasRef} />
+              <div className="bg-[#f8fafc] p-6 flex items-center justify-center min-h-[600px]">
+                <div
+                  className={`w-full transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onWheel={handleWheel}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  <VoteFramePreview
+                    uploadedImage={uploadedImage}
+                    selectedFrame={selectedFrame}
+                    zoom={zoom}
+                    offsetX={offsetX}
+                    offsetY={offsetY}
+                    canvasRef={canvasRef}
+                  />
                 </div>
               </div>
             </Card>
           </div>
         </div>
       </div>
+
       <div className="bg-[#1B5E20] text-white text-center py-8 mt-8 border-t-4 border-[#E41E3F]">
         <p className="bengali-text font-medium opacity-90">© ২০২৬ বাংলাদেশ জাতীয়তাবাদী দল (বিএনপি)</p>
         <p className="text-xs opacity-60 mt-1">সর্বস্বত্ব সংরক্ষিত</p>
