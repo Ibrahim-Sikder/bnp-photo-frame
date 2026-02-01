@@ -457,7 +457,7 @@ export default function App() {
         </div>
 
         {/* Desktop Layout: 6-6 Column Split */}
-        <div className="hidden lg:block px-24">
+        <div className="hidden lg:block md:px-24 px-2">
           <div className="grid grid-cols-12 gap-6 items-start">
             {/* Left Panel - Controls (6 columns) */}
             <div className="col-span-6 w-full">
