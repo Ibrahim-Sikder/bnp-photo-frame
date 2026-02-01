@@ -151,7 +151,7 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
       </div>
 
       {/* Hide scrollbar */}
-      <style>{`
+      <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

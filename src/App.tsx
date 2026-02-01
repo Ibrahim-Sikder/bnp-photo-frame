@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Download, RotateCcw, ZoomIn, ZoomOut, Move } from "lucide-react";
+import { Upload, Download, RotateCcw, ZoomIn, ZoomOut, Move, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import VoteFramePreview from "./app/components/VoteFramePreview";
 import { Button } from "./components/ui/button";
 import FrameCarousel from "./app/components/FrameCarousel";
@@ -124,52 +124,99 @@ export default function App() {
     setZoom((prev) => Math.max(50, prev - 20));
   };
 
+  const moveStep = 20;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <style>{`
+        .bengali-text {
+          font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
+        }
+        
+        .touch-manipulation {
+          touch-action: manipulation;
+        }
+        
+        .slider-orange::-webkit-slider-thumb {
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ea580c;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        .slider-teal::-webkit-slider-thumb {
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #0d9488;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 640px) {
+          .slider-orange::-webkit-slider-thumb,
+          .slider-teal::-webkit-slider-thumb {
+            width: 28px;
+            height: 28px;
+          }
+        }
+      `}</style>
+
       {/* Hero Header */}
-      <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-4 md:py-6 px-4 text-center text-white shadow-lg relative overflow-hidden">
+      <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-3 md:py-6 px-4 text-center text-white shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
-          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className=" object-contain" />
+          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="h-10 md:h-16 object-contain" />
         </div>
       </div>
 
-      <div className="container  mx-auto px-2 md:px-24  py-4 md:py-8">
+      <div className="container mx-auto px-3 md:px-4 py-3 md:py-8 max-w-7xl">
         {/* Mobile Layout */}
         <div className="lg:hidden space-y-3">
-          {/* Step Indicator - Mobile */}
-          {!uploadedImage && (
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
-              <div className="flex items-start gap-3">
-                <div className="bg-white/20 rounded-full p-2 mt-0.5">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-1 bengali-text">শুরু করুন!</h3>
-                  <p className="text-sm bengali-text opacity-90">১. নিচের বাটনে ক্লিক করে আপনার ছবি আপলোড করুন</p>
-                  <p className="text-sm bengali-text opacity-90 mt-1">২. ফ্রেম সিলেক্ট করুন</p>
-                  <p className="text-sm bengali-text opacity-90 mt-1">৩. জুম ও পজিশন ঠিক করুন</p>
-                  <p className="text-sm bengali-text opacity-90 mt-1">৪. HD ডাউনলোড করুন</p>
-                </div>
-              </div>
+          {/* Step 1: Frame Selection */}
+          <Card className="shadow-lg border-0 overflow-hidden bg-white">
+            <div className="bg-gradient-to-r from-[#E41E3F] to-[#c41830] p-3 text-white">
+              <h2 className="text-sm sm:text-base font-bold bengali-text">১. ফ্রেম নির্বাচন করুন 🖼️</h2>
             </div>
-          )}
+            <div className="p-3">
+              <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+            </div>
+          </Card>
 
-          {/* Preview Section - Always Visible with Default Frame */}
-          <Card className="shadow-xl border-0 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-3 text-white flex justify-between items-center">
-              <h2 className="text-base font-bold bengali-text">📸 প্রিভিউ দেখুন</h2>
+          {/* Step 2: Upload Image */}
+          <Card className="shadow-lg border-0 overflow-hidden bg-white">
+            <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-3 text-white">
+              <h2 className="text-sm sm:text-base font-bold bengali-text">২. ছবি আপলোড করুন 📷</h2>
+            </div>
+            <div className="p-3">
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-5 sm:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-lg transition-all active:scale-95 touch-manipulation"
+              >
+                <Upload className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                <span className="bengali-text">{uploadedImage ? "নতুন ছবি নির্বাচন" : "ছবি নির্বাচন করুন"}</span>
+              </Button>
+            </div>
+          </Card>
+
+          {/* Step 3: Preview */}
+          <Card className="shadow-lg border-0 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-3 text-white flex justify-between items-center">
+              <h2 className="text-sm sm:text-base font-bold bengali-text">৩. প্রিভিউ 👁️</h2>
               {uploadedImage && (
-                <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90 flex items-center gap-1">
+                <span className="text-xs bg-white/20 px-2 py-1 rounded flex items-center gap-1">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                   Live
                 </span>
               )}
             </div>
             <div
-              className="bg-[#f8fafc] p-3 flex items-center justify-center min-h-[320px]"
+              className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 sm:p-4"
               onWheel={handleWheel}
               style={{ touchAction: 'none' }}
             >
@@ -194,149 +241,179 @@ export default function App() {
               </div>
             </div>
             {uploadedImage && (
-              <div className="bg-blue-50 border-t border-blue-100 p-2 flex items-center gap-2 text-xs text-blue-700">
-                <Move className="w-4 h-4" />
-                <span className="bengali-text">টিপস: আঙুল দিয়ে টেনে সরান, পিঞ্চ করে জুম করুন</span>
+              <div className="bg-blue-50 border-t border-blue-100 p-2 text-center">
+                <span className="text-xs text-blue-700 bengali-text">💡 আঙুল দিয়ে টেনে সরান</span>
               </div>
             )}
           </Card>
 
-          {/* Controls Section - Mobile */}
-          <Card className="shadow-xl border-0 overflow-hidden bg-white">
-            <div className="bg-gradient-to-r from-[#E41E3F] to-[#c41830] p-3 text-white">
-              <h2 className="text-base font-bold bengali-text">⚙️ কন্ট্রোল প্যানেল</h2>
-            </div>
-            <div className="p-3 space-y-3">
-              {/* Upload Button - Always Visible */}
-              <div>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-6 text-base font-semibold rounded-xl shadow-lg transition-all hover:scale-[1.02] relative overflow-hidden"
-                >
-                  <span className="absolute inset-0 bg-white/10 animate-pulse"></span>
-                  <Upload className="mr-2 h-5 w-5 relative z-10" />
-                  <span className="relative z-10 bengali-text">{uploadedImage ? "নতুন ছবি সিলেক্ট করুন" : "১. ছবি সিলেক্ট করুন 📷"}</span>
-                </Button>
-              </div>
+          {/* Step 4: Zoom Control */}
+          {uploadedImage && (
+            <>
+              <Card className="shadow-lg border-0 overflow-hidden">
+                <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-3 text-white">
+                  <h2 className="text-sm sm:text-base font-bold bengali-text flex items-center gap-2">
+                    <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ৪. জুম করুন
+                  </h2>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <Button
+                      size="lg"
+                      onClick={handleZoomOut}
+                      className="h-14 w-14 sm:h-16 sm:w-16 p-0 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                    >
+                      <ZoomOut className="h-7 w-7 sm:h-8 sm:w-8" />
+                    </Button>
 
-              {/* Frame Selection - Always Visible */}
-              <div>
-                <h3 className="text-sm font-bold text-gray-800 mb-2 bengali-text border-l-4 border-[#E41E3F] pl-2 flex items-center gap-2">
-                  <span>২. ফ্রেম নির্বাচন করুন 🖼️</span>
-                </h3>
-                <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
-              </div>
+                    <div className="flex-1 text-center">
+                      <div className="text-2xl sm:text-3xl font-bold text-orange-600">{zoom}%</div>
+                      <div className="text-xs text-gray-500 bengali-text">জুম লেভেল</div>
+                    </div>
 
-              {/* Additional Controls - Show when image uploaded */}
-              {uploadedImage && (
-                <>
-                  {/* Zoom Control */}
-                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-sm font-bold text-gray-700 bengali-text flex items-center gap-1">
-                        <ZoomIn className="w-4 h-4 text-[#E41E3F]" />
-                        ৩. জুম করুন
-                      </label>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleZoomOut}
-                          className="h-8 w-8 p-0 border-[#E41E3F] text-[#E41E3F] hover:bg-[#E41E3F] hover:text-white"
-                        >
-                          <ZoomOut className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm font-bold bg-[#E41E3F] text-white px-3 py-1 rounded min-w-[60px] text-center">{zoom}%</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleZoomIn}
-                          className="h-8 w-8 p-0 border-[#E41E3F] text-[#E41E3F] hover:bg-[#E41E3F] hover:text-white"
-                        >
-                          <ZoomIn className="h-4 w-4" />
-                        </Button>
+                    <Button
+                      size="lg"
+                      onClick={handleZoomIn}
+                      className="h-14 w-14 sm:h-16 sm:w-16 p-0 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                    >
+                      <ZoomIn className="h-7 w-7 sm:h-8 sm:w-8" />
+                    </Button>
+                  </div>
+
+                  <input
+                    type="range"
+                    min="50"
+                    max="500"
+                    step="10"
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="w-full h-4 bg-orange-200 rounded-lg appearance-none cursor-pointer slider-orange touch-manipulation"
+                  />
+                  <div className="flex justify-between text-xs text-orange-700 mt-2 font-semibold bengali-text">
+                    <span>ছোট</span>
+                    <span>বড়</span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Step 5: Position Control */}
+              <Card className="shadow-lg border-0 overflow-hidden">
+                <div className="bg-gradient-to-r from-teal-500 to-teal-600 p-3 text-white">
+                  <h2 className="text-sm sm:text-base font-bold bengali-text flex items-center gap-2">
+                    <Move className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ৫. পজিশন ঠিক করুন
+                  </h2>
+                </div>
+                <div className="p-4 space-y-4">
+                  <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-xl border-2 border-teal-200">
+                    <div className="text-center mb-3">
+                      <div className="text-sm font-bold text-teal-800 bengali-text mb-1">তীর বাটন দিয়ে সরান</div>
+                      <div className="flex items-center justify-center gap-2 text-xs text-teal-600">
+                        <span className="bengali-text">X: <strong>{offsetX}</strong></span>
+                        <span>•</span>
+                        <span className="bengali-text">Y: <strong>{offsetY}</strong></span>
                       </div>
                     </div>
-                    <input
-                      type="range"
-                      min="50"
-                      max="500"
-                      step="5"
-                      value={zoom}
-                      onChange={(e) => setZoom(Number(e.target.value))}
-                      className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F] zoom-slider"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>ছোট</span>
-                      <span>বড়</span>
+
+                    <div className="flex flex-col items-center gap-2">
+                      <Button
+                        onClick={() => setOffsetY(prev => Math.max(-300, prev - moveStep))}
+                        className="h-12 w-12 sm:h-14 sm:w-14 p-0 bg-teal-500 hover:bg-teal-600 text-white rounded-xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                      >
+                        <ChevronUp className="h-7 w-7" />
+                      </Button>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => setOffsetX(prev => Math.max(-300, prev - moveStep))}
+                          className="h-12 w-12 sm:h-14 sm:w-14 p-0 bg-teal-500 hover:bg-teal-600 text-white rounded-xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                        >
+                          <ChevronLeft className="h-7 w-7" />
+                        </Button>
+
+                        <Button
+                          onClick={() => { setOffsetX(0); setOffsetY(0); }}
+                          className="h-12 w-12 sm:h-14 sm:w-14 p-0 bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-lg active:scale-95 transition-all bengali-text text-xs font-bold touch-manipulation"
+                        >
+                          মাঝে
+                        </Button>
+
+                        <Button
+                          onClick={() => setOffsetX(prev => Math.min(300, prev + moveStep))}
+                          className="h-12 w-12 sm:h-14 sm:w-14 p-0 bg-teal-500 hover:bg-teal-600 text-white rounded-xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                        >
+                          <ChevronRight className="h-7 w-7" />
+                        </Button>
+                      </div>
+
+                      <Button
+                        onClick={() => setOffsetY(prev => Math.min(300, prev + moveStep))}
+                        className="h-12 w-12 sm:h-14 sm:w-14 p-0 bg-teal-500 hover:bg-teal-600 text-white rounded-xl shadow-lg active:scale-95 transition-all touch-manipulation"
+                      >
+                        <ChevronDown className="h-7 w-7" />
+                      </Button>
                     </div>
                   </div>
 
-                  {/* Position Controls */}
-                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 space-y-3">
-                    <h4 className="text-sm font-bold text-gray-700 bengali-text flex items-center gap-1">
-                      <Move className="w-4 h-4 text-[#007A5E]" />
-                      ৪. পজিশন ঠিক করুন
-                    </h4>
+                  <details className="bg-gray-50 rounded-lg">
+                    <summary className="cursor-pointer p-3 text-sm font-bold text-gray-700 bengali-text">
+                      🎯 সূক্ষ্ম নিয়ন্ত্রণ (ঐচ্ছিক)
+                    </summary>
+                    <div className="p-3 space-y-3 border-t border-gray-200">
+                      <div>
+                        <label className="text-xs font-bold text-teal-700 mb-1 block bengali-text">
+                          ← ডানে-বামে → ({offsetX})
+                        </label>
+                        <input
+                          type="range"
+                          min="-300"
+                          max="300"
+                          step="5"
+                          value={offsetX}
+                          onChange={(e) => setOffsetX(Number(e.target.value))}
+                          className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer slider-teal touch-manipulation"
+                        />
+                      </div>
 
-                    {/* X Position */}
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1 block bengali-text flex items-center justify-between">
-                        <span>← ডানে-বামে →</span>
-                        <span className="text-[#007A5E]">{offsetX > 0 ? `+${offsetX}` : offsetX}</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="-300"
-                        max="300"
-                        step="5"
-                        value={offsetX}
-                        onChange={(e) => setOffsetX(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
-                      />
+                      <div>
+                        <label className="text-xs font-bold text-teal-700 mb-1 block bengali-text">
+                          ↑ উপরে-নিচে ↓ ({offsetY})
+                        </label>
+                        <input
+                          type="range"
+                          min="-300"
+                          max="300"
+                          step="5"
+                          value={offsetY}
+                          onChange={(e) => setOffsetY(Number(e.target.value))}
+                          className="w-full h-3 bg-teal-200 rounded-lg appearance-none cursor-pointer slider-teal touch-manipulation"
+                        />
+                      </div>
                     </div>
+                  </details>
+                </div>
+              </Card>
 
-                    {/* Y Position */}
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-1 block bengali-text flex items-center justify-between">
-                        <span>↑ উপরে-নিচে ↓</span>
-                        <span className="text-[#007A5E]">{offsetY > 0 ? `+${offsetY}` : offsetY}</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="-300"
-                        max="300"
-                        step="5"
-                        value={offsetY}
-                        onChange={(e) => setOffsetY(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-2 pt-2">
-                    <Button
-                      onClick={handleDownload}
-                      className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-6 font-bold rounded-xl shadow-lg transition-all hover:scale-[1.02]"
-                    >
-                      <Download className="mr-1 h-5 w-5" />
-                      <span className="bengali-text">HD ডাউনলোড</span>
-                    </Button>
-                    <Button
-                      onClick={handleReset}
-                      variant="outline"
-                      className="border-2 border-[#007A5E] text-[#007A5E] hover:bg-[#007A5E] hover:text-white py-6 font-bold rounded-xl transition-all"
-                    >
-                      <RotateCcw className="mr-1 h-5 w-5" />
-                      <span className="bengali-text">নতুন শুরু</span>
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </Card>
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 pb-4">
+                <Button
+                  onClick={handleDownload}
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-6 sm:py-7 text-sm sm:text-base font-bold rounded-2xl shadow-lg transition-all active:scale-95 touch-manipulation"
+                >
+                  <Download className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                  <span className="bengali-text">HD ডাউনলোড</span>
+                </Button>
+                <Button
+                  onClick={handleReset}
+                  className="border-2 border-red-500 bg-white text-red-600 hover:bg-red-600 hover:text-white py-6 sm:py-7 text-sm sm:text-base font-bold rounded-2xl shadow-lg transition-all active:scale-95 touch-manipulation"
+                >
+                  <RotateCcw className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                  <span className="bengali-text">নতুন শুরু</span>
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Desktop Layout: 6-6 Column Split */}
@@ -349,7 +426,6 @@ export default function App() {
                   <h2 className="text-lg font-bold bengali-text">⚙️ কন্ট্রোল প্যানেল</h2>
                 </div>
                 <div className="p-6 space-y-5">
-                  {/* Upload Section */}
                   <div>
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     <Button
@@ -361,9 +437,8 @@ export default function App() {
                     </Button>
                   </div>
 
-                  {/* Frame Selection - Always Visible */}
                   <div>
-                    <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-3 flex items-center gap-2">
+                    <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-3">
                       ২. ফ্রেম নির্বাচন করুন
                     </h3>
                     <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
@@ -371,28 +446,25 @@ export default function App() {
 
                   {uploadedImage && (
                     <>
-                      {/* Zoom Control */}
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
                         <div className="flex justify-between items-center mb-3">
-                          <label className="text-base font-bold text-gray-700 bengali-text flex items-center gap-2">
-                            <ZoomIn className="w-5 h-5 text-[#E41E3F]" />
+                          <label className="text-base font-bold text-orange-900 bengali-text flex items-center gap-2">
+                            <ZoomIn className="w-5 h-5 text-orange-600" />
                             ৩. জুম করুন
                           </label>
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
-                              variant="outline"
                               onClick={handleZoomOut}
-                              className="h-9 w-9 p-0"
+                              className="h-9 w-9 p-0 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
                             >
                               <ZoomOut className="h-4 w-4" />
                             </Button>
-                            <span className="text-sm font-bold bg-[#E41E3F] text-white px-4 py-1.5 rounded min-w-[70px] text-center">{zoom}%</span>
+                            <span className="text-sm font-bold bg-orange-600 text-white px-4 py-1.5 rounded min-w-[70px] text-center">{zoom}%</span>
                             <Button
                               size="sm"
-                              variant="outline"
                               onClick={handleZoomIn}
-                              className="h-9 w-9 p-0"
+                              className="h-9 w-9 p-0 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
                             >
                               <ZoomIn className="h-4 w-4" />
                             </Button>
@@ -402,28 +474,26 @@ export default function App() {
                           type="range"
                           min="50"
                           max="500"
-                          step="5"
+                          step="10"
                           value={zoom}
                           onChange={(e) => setZoom(Number(e.target.value))}
-                          className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]"
+                          className="w-full h-3 bg-orange-200 rounded-lg appearance-none cursor-pointer slider-orange"
                         />
-                        <div className="flex justify-between text-xs text-gray-500 mt-2">
+                        <div className="flex justify-between text-xs text-orange-700 mt-2 font-semibold">
                           <span>50%</span>
                           <span>500%</span>
                         </div>
                       </div>
 
-                      {/* Position Controls */}
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
-                        <h4 className="text-base font-bold text-gray-700 bengali-text flex items-center gap-2">
-                          <Move className="w-5 h-5 text-[#007A5E]" />
+                      <div className="bg-teal-50 p-4 rounded-lg border border-teal-200 space-y-4">
+                        <h4 className="text-base font-bold text-teal-900 bengali-text flex items-center gap-2">
+                          <Move className="w-5 h-5 text-teal-600" />
                           ৪. পজিশন ঠিক করুন
                         </h4>
 
                         <div>
-                          <label className="text-sm font-bold text-gray-600 mb-2 block bengali-text flex items-center justify-between">
-                            <span>← ডানে-বামে সরান →</span>
-                            <span className="text-[#007A5E]">{offsetX > 0 ? `+${offsetX}` : offsetX}</span>
+                          <label className="text-sm font-bold text-teal-700 mb-2 block bengali-text">
+                            ← ডানে-বামে সরান → ({offsetX})
                           </label>
                           <input
                             type="range"
@@ -432,14 +502,13 @@ export default function App() {
                             step="5"
                             value={offsetX}
                             onChange={(e) => setOffsetX(Number(e.target.value))}
-                            className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                            className="w-full h-2.5 bg-teal-200 rounded-lg appearance-none cursor-pointer slider-teal"
                           />
                         </div>
 
                         <div>
-                          <label className="text-sm font-bold text-gray-600 mb-2 block bengali-text flex items-center justify-between">
-                            <span>↑ উপরে-নিচে সরান ↓</span>
-                            <span className="text-[#007A5E]">{offsetY > 0 ? `+${offsetY}` : offsetY}</span>
+                          <label className="text-sm font-bold text-teal-700 mb-2 block bengali-text">
+                            ↑ উপরে-নিচে সরান ↓ ({offsetY})
                           </label>
                           <input
                             type="range"
@@ -448,12 +517,11 @@ export default function App() {
                             step="5"
                             value={offsetY}
                             onChange={(e) => setOffsetY(Number(e.target.value))}
-                            className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                            className="w-full h-2.5 bg-teal-200 rounded-lg appearance-none cursor-pointer slider-teal"
                           />
                         </div>
                       </div>
 
-                      {/* Info Box */}
                       <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
                         <svg className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -463,7 +531,6 @@ export default function App() {
                         </p>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="grid grid-cols-2 gap-3 pt-2">
                         <Button
                           onClick={handleDownload}
@@ -473,8 +540,7 @@ export default function App() {
                         </Button>
                         <Button
                           onClick={handleReset}
-                          variant="outline"
-                          className="border-2 border-[#007A5E] text-[#007A5E] hover:bg-[#007A5E] hover:text-white py-4 font-bold rounded-lg transition-all"
+                          className="border-2 border-red-500 bg-white text-red-600 hover:bg-red-600 hover:text-white py-4 font-bold rounded-lg transition-all"
                         >
                           <RotateCcw className="mr-2 h-5 w-5" /> রিসেট
                         </Button>
@@ -498,7 +564,7 @@ export default function App() {
                   )}
                 </div>
                 <div
-                  className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 flex items-center justify-center min-h-[700px]"
+                  className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 flex items-center justify-center min-h-[700px] overflow-hidden"
                   onWheel={handleWheel}
                   style={{ touchAction: 'none' }}
                 >
@@ -529,32 +595,10 @@ export default function App() {
       </div>
 
       {/* Footer */}
-      <div className="bg-gradient-to-r from-[#1B5E20] to-[#0d3f16] text-white text-center py-6 mt-8 border-t-4 border-[#E41E3F] shadow-lg">
-        <p className="bengali-text font-semibold opacity-95 text-base md:text-lg">© ২০২৬ বাংলাদেশ জাতীয়তাবাদী দল (বিএনপি)</p>
+      <div className="bg-gradient-to-r from-[#1B5E20] to-[#0d3f16] text-white text-center py-4 md:py-6 mt-6 md:mt-8 border-t-4 border-[#E41E3F] shadow-lg">
+        <p className="bengali-text font-semibold opacity-95 text-sm md:text-lg">© ২০২৬ বাংলাদেশ জাতীয়তাবাদী দল (বিএনপি)</p>
         <p className="text-xs opacity-70 mt-1">সর্বস্বত্ব সংরক্ষিত | World's Best Frame Generator 🌟</p>
       </div>
-
-      <style>{`
-        .bengali-text {
-          font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
-        }
-        
-        .zoom-slider::-webkit-slider-thumb {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: #E41E3F;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        @media (max-width: 640px) {
-          .zoom-slider::-webkit-slider-thumb {
-            width: 24px;
-            height: 24px;
-          }
-        }
-      `}</style>
     </div>
   );
 }

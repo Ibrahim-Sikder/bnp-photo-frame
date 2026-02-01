@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/immutability */
 import { useEffect, useRef, useMemo } from "react";
 
 interface VoteFramePreviewProps {
@@ -177,15 +176,14 @@ export default function VoteFramePreview({
       <div className="relative w-full">
         <canvas
           ref={canvasRef}
-          className="w-full h-auto rounded-xl shadow-2xl border-4 border-white ring-2 ring-gray-200"
+          width={1200}
+          height={1200}
+          className="w-full rounded-lg md:rounded-xl shadow-2xl border-2 md:border-4 border-white ring-1 md:ring-2 ring-gray-200 bg-white"
           style={{
             display: "block",
-            aspectRatio: "1/1",
-            imageRendering: "auto",
-            transform: "translateZ(0)",
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
             maxWidth: "100%",
+            height: "auto",
+            aspectRatio: "1",
           }}
         />
 
@@ -227,7 +225,7 @@ export default function VoteFramePreview({
         )}
       </div>
 
-      <style>{`
+      <style jsx>{`
         .bengali-text {
           font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
         }
