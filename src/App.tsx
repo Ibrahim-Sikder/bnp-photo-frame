@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-
 import { Upload, Download, RotateCcw } from "lucide-react";
 import VoteFramePreview from "./components/VoteFramePreview";
 import { Button } from "./components/ui/button";
@@ -93,15 +92,14 @@ export default function App() {
       <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-8 px-4 text-center text-white shadow-md relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="container mx-auto w-full flex justify-center relative z-10">
-
-          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className=" object-contain" />
+          <img src="/images/sobar_age_bd.avif" alt="BNP Logo" className="object-contain" />
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Panel */}
-          <div className="lg:col-span-4 w-full">
+          <div className="lg:col-span-5 w-full">
             <Card className="shadow-xl border-0 overflow-hidden">
               <div className="bg-[#E41E3F] p-5 text-white">
                 <h2 className="text-xl font-bold bengali-text">কন্ট্রোল প্যানেল</h2>
@@ -156,13 +154,13 @@ export default function App() {
           </div>
 
           {/* Right Panel */}
-          <div className="lg:col-span-8 w-full">
+          <div className="lg:col-span-7 w-full">
             <Card className="shadow-xl border-0 overflow-hidden sticky top-6">
               <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-5 text-white flex justify-between items-center">
                 <h2 className="text-xl font-bold bengali-text">প্রিভিউ</h2>
                 <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90">Live View</span>
               </div>
-              <div className="bg-[#f8fafc] p-4 md:p-8 min-h-[500px] flex items-center justify-center">
+              <div className="bg-[#f8fafc]  flex items-center justify-center">
                 <div className={`w-full max-w-lg transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
                   <VoteFramePreview uploadedImage={uploadedImage} selectedFrame={selectedFrame} zoom={zoom} offsetX={offsetX} offsetY={offsetY} canvasRef={canvasRef} />
                 </div>

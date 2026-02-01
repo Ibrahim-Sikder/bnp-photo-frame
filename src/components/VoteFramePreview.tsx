@@ -46,6 +46,7 @@ export default function VoteFramePreview({
       const frameImg = new Image();
       frameImg.crossOrigin = "anonymous";
 
+      // Using .png
       frameImg.src = `/frames/${selectedFrame}.png`;
 
       frameImg.onload = () => {
@@ -55,7 +56,7 @@ export default function VoteFramePreview({
 
       frameImg.onerror = () => {
         if (isCancelled) return;
-        console.warn("PNG failed, trying JPEG");
+        console.warn("PNG failed, trying JPEG fallback");
         frameImg.src = `/frames/${selectedFrame}.jpeg`;
       };
     };
@@ -76,21 +77,17 @@ export default function VoteFramePreview({
   ) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const centerX = 540;
-    const centerY = 640;
+    const centerX = 640;
+    const centerY = 700;
 
-    // FIX: Reduced Radius from 380 to 360.
-    // This creates a gap so the image does NOT touch or cover the frame border.
-    // The image will stay strictly inside the frame.
-    const radius = 360;
+    // FIX: Increased Radius from 360 to 370.
+    // This gives the image more space so it doesn't look "cut off" or shrink when moving.
+    const radius = 470;
 
-    // --- STEP 1: Draw Frame (Bottom Layer) ---
-    ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
-
-    // --- STEP 2: Draw User Image (Top Layer, Clipped) ---
+    // --- STEP 1: Draw User Image (Bottom Layer / Low Z-Index) ---
     ctx.save();
 
-    // Create Circular Clipping Path with reduced radius
+    // Create Circular Clipping Path
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.clip();
@@ -108,6 +105,10 @@ export default function VoteFramePreview({
 
     ctx.drawImage(img, posX, posY, drawWidth, drawHeight);
     ctx.restore(); // Remove clip
+
+    // --- STEP 2: Draw Frame (Top Layer / High Z-Index) ---
+    // This ensures the frame is ALWAYS on top, preventing overflow visually.
+    ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
   };
 
   return (
@@ -122,6 +123,7 @@ export default function VoteFramePreview({
                 display: "block",
                 aspectRatio: "1080/1350",
                 maxHeight: "500px",
+                minWidth: '500px'
               }}
             />
             <div className="mt-3 text-center">

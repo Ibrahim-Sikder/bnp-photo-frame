@@ -15,25 +15,26 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
   const frames = [
     {
       id: "frame1" as const,
-      imageUrl: "/frames/frame.jpeg",
+      imageUrl: "/frames/frame1.png",
     },
     {
       id: "frame2" as const,
-      imageUrl: "/frames/frame2.jpeg",
+      imageUrl: "/frames/frame2.png",
     },
     {
       id: "frame3" as const,
-      imageUrl: "/frames/frame3.jpeg",
+      imageUrl: "/frames/frame3.png",
     },
     {
       id: "frame4" as const,
-      imageUrl: "/frames/frame4.jpeg",
+      imageUrl: "/frames/frame4.png",
     },
     {
       id: "frame5" as const,
-      imageUrl: "/frames/frame5.jpeg",
+      imageUrl: "/frames/frame5.png",
     },
   ];
+
   const updateScrollButtons = () => {
     if (containerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
@@ -113,8 +114,9 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                     loading="lazy"
                     onError={(e) => {
-                      const fallbackSVG = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150'%3E%3Crect width='200' height='150' fill='%23f8f9fa'/%3E%3Ctext x='100' y='80' text-anchor='middle' font-size='12' fill='%23495057' font-family='system-ui'%3E${frame.id}%3C/text%3E%3C/svg%3E`;
-                      e.currentTarget.src = fallbackSVG;
+                      const target = e.target as HTMLImageElement;
+                      target.style.backgroundColor = "#ddd";
+                      target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' font-size='12' fill='%23999'%3E${frame.id}%3C/text%3E%3C/svg%3E`;
                     }}
                   />
                 </div>
