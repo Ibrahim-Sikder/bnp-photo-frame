@@ -206,43 +206,73 @@ export default function App() {
         </div>
       </div>
 
+
       <div className="container mx-auto py-3 md:py-8 max-w-8xl">
+        <div className="md:hidden block">
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="file-input"
+            />
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-5 md:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-lg transition-all active:scale-95 touch-manipulation"
+            >
+              <Upload className="mr-2 h-5 w-5 md:h-6 md:w-6" />
+              <span className="bengali-text">{uploadedImage ? "নতুন ছবি সিলেক্ট করুন" : "ছবি সিলেক্ট করুন"}</span>
+            </Button>
+          </div>
+
+          {/* Frame Selection */}
+          <div>
+            <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-3">
+              ২. ফ্রেম নির্বাচন করুন
+            </h3>
+            <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+          </div>
+        </div>
         {/* Main Content Area - Single Responsive Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <div className="lg:grid flex  flex-col-reverse lg:grid-cols-12 gap-4 items-start">
           {/* Left Panel - Controls (12 columns on mobile, 6 on desktop) */}
-          <div className="col-span-1 lg:col-span-6 w-full">
+          <div className=" lg:col-span-6 w-full md:col-start-1 ">
             <Card className="shadow-lg md:shadow-2xl border-0 overflow-hidden bg-white lg:sticky lg:top-6">
               <div className="bg-gradient-to-r from-[#E41E3F] to-[#c41830] p-3 md:p-4 text-white">
                 <h2 className="text-sm sm:text-base md:text-lg font-bold bengali-text">⚙️ কন্ট্রোল প্যানেল</h2>
               </div>
               <div className="p-3 md:p-6 space-y-4 md:space-y-5">
                 {/* Upload Button */}
-                <div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="file-input"
-                  />
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-5 md:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-lg transition-all active:scale-95 touch-manipulation"
-                  >
-                    <Upload className="mr-2 h-5 w-5 md:h-6 md:w-6" />
-                    <span className="bengali-text">{uploadedImage ? "নতুন ছবি সিলেক্ট করুন" : "ছবি সিলেক্ট করুন"}</span>
-                  </Button>
-                </div>
 
-                {/* Frame Selection */}
-                <div>
-                  <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-3">
-                    ২. ফ্রেম নির্বাচন করুন
-                  </h3>
-                  <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
-                </div>
+                <div className="md:block hidden">
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="file-input"
+                    />
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full bg-gradient-to-r from-[#E41E3F] to-[#c41830] hover:from-[#c41830] hover:to-[#a01525] text-white py-5 md:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-lg transition-all active:scale-95 touch-manipulation"
+                    >
+                      <Upload className="mr-2 h-5 w-5 md:h-6 md:w-6" />
+                      <span className="bengali-text">{uploadedImage ? "নতুন ছবি সিলেক্ট করুন" : "ছবি সিলেক্ট করুন"}</span>
+                    </Button>
+                  </div>
 
+                  {/* Frame Selection */}
+                  <div>
+                    <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-3">
+                      ২. ফ্রেম নির্বাচন করুন
+                    </h3>
+                    <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+                  </div>
+                </div>
                 {/* Zoom Controls - Show only when image uploaded */}
                 {uploadedImage && (
                   <>
@@ -452,7 +482,7 @@ export default function App() {
           </div>
 
           {/* Right Panel - Preview (12 columns on mobile, 6 on desktop) */}
-          <div className="col-span-1 lg:col-span-6 w-full">
+          <div className=" lg:col-span-6 w-full md:col-start-2 sm:col-start-1">
             <Card className="shadow-lg md:shadow-2xl border-0 overflow-hidden bg-white lg:sticky lg:top-6 mt-4 lg:mt-0">
               <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-3 md:p-4 text-white flex justify-between items-center">
                 <h2 className="text-sm sm:text-base md:text-lg font-bold bengali-text">📸 প্রিভিউ</h2>
