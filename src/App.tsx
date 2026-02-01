@@ -206,9 +206,9 @@ export default function App() {
         </div>
       </div>
 
-      <div className="container mx-auto px-3 md:px-4 py-3 md:py-8 max-w-7xl">
+      <div className="container mx-auto  py-3 md:py-8 max-w-8xl">
         {/* Mobile Layout */}
-        <div className="lg:hidden space-y-3">
+        <div className="lg:hidden block space-y-3 ">
           {/* Step 1: Frame Selection */}
           <Card className="shadow-lg border-0 overflow-hidden bg-white">
             <div className="bg-gradient-to-r from-[#E41E3F] to-[#c41830] p-3 text-white">
@@ -457,8 +457,8 @@ export default function App() {
         </div>
 
         {/* Desktop Layout: 6-6 Column Split */}
-        <div className="hidden lg:block md:px-24 px-2">
-          <div className="grid grid-cols-12 gap-6 items-start">
+        <div className="hidden lg:block md:px-20 px-2">
+          <div className="grid grid-cols-12 gap-4 items-start">
             {/* Left Panel - Controls (6 columns) */}
             <div className="col-span-6 w-full">
               <Card className="shadow-2xl border-0 overflow-hidden sticky top-6">

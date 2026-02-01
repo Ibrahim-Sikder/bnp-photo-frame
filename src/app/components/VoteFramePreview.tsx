@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 
 interface VoteFramePreviewProps {
   uploadedImage: string | null;
@@ -21,6 +21,30 @@ export default function VoteFramePreview({
   const imageCache = useRef<{ [key: string]: HTMLImageElement }>({});
   const frameCache = useRef<{ [key: string]: HTMLImageElement }>({});
   const animationFrameId = useRef<number | null>(null);
+  const [canvasSize, setCanvasSize] = useState({ width: 1200, height: 1200 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+
+      // Calculate canvas size based on container width
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        const size = Math.min(mobile ? 800 : 1200, containerWidth);
+        setCanvasSize({ width: size, height: size });
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Pre-load and cache the uploaded image
   const cachedUserImage = useMemo(() => {
@@ -60,9 +84,9 @@ export default function VoteFramePreview({
     });
     if (!ctx) return;
 
-    // High-quality canvas size
-    canvas.width = 1200;
-    canvas.height = 1200;
+    // Set responsive canvas size
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
 
     const drawFrame = () => {
       // Check if frame is loaded
@@ -98,7 +122,7 @@ export default function VoteFramePreview({
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [uploadedImage, selectedFrame, zoom, offsetX, offsetY, canvasRef, cachedUserImage, cachedFrameImage]);
+  }, [uploadedImage, selectedFrame, zoom, offsetX, offsetY, canvasRef, cachedUserImage, cachedFrameImage, canvasSize]);
 
   const drawCanvas = (
     ctx: CanvasRenderingContext2D,
@@ -115,10 +139,10 @@ export default function VoteFramePreview({
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
 
-    // Circle configuration
+    // Circle configuration - responsive radius
     const centerX = canvasWidth / 2;
     const centerY = canvasHeight / 2;
-    const radius = 540; // Large radius for better visibility
+    const radius = Math.min(canvasWidth, canvasHeight) * 0.45; // 45% of canvas size
 
     // --- STEP 1: Draw User Image or White Background ---
     ctx.save();
@@ -137,9 +161,10 @@ export default function VoteFramePreview({
       const drawWidth = img.width * finalScale;
       const drawHeight = img.height * finalScale;
 
-      // Position with offset (multiplier for smooth control)
-      const posX = centerX - drawWidth / 2 + (offsetX * 3);
-      const posY = centerY - drawHeight / 2 + (offsetY * 3);
+      // Adjust offset sensitivity based on canvas size
+      const offsetMultiplier = isMobile ? 2 : 3;
+      const posX = centerX - drawWidth / 2 + (offsetX * offsetMultiplier);
+      const posY = centerY - drawHeight / 2 + (offsetY * offsetMultiplier);
 
       // High-quality rendering
       ctx.imageSmoothingEnabled = true;
@@ -157,6 +182,13 @@ export default function VoteFramePreview({
 
     // --- STEP 2: Draw Frame ON TOP ---
     if (frameImg.complete) {
+      // Clear any previous artifacts
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.drawImage(frameImg, 0, 0, canvasWidth, canvasHeight);
+      ctx.restore();
+
+      // Draw frame normally
       ctx.drawImage(frameImg, 0, 0, canvasWidth, canvasHeight);
     }
 
@@ -180,24 +212,35 @@ export default function VoteFramePreview({
           font-family: 'SolaimanLipi', 'Noto Sans Bengali', 'Arial', sans-serif;
         }
         
-        /* Force canvas responsiveness on all devices */
+        /* Force canvas responsiveness */
         .preview-canvas {
           width: 100% !important;
           height: auto !important;
           max-width: 100% !important;
           display: block !important;
+          aspect-ratio: 1 / 1;
+        }
+        
+        /* Ensure container maintains aspect ratio */
+        .canvas-container {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1 / 1;
+        }
+        
+        /* Fix for mobile devices */
+        @media (max-width: 768px) {
+          .preview-canvas {
+            max-height: 80vh !important;
+          }
         }
       `}} />
 
-      {/* Canvas - Always show with default frame */}
-      <div className="relative w-full">
+      {/* Canvas Container */}
+      <div className="canvas-container">
         <canvas
           ref={canvasRef}
           className="preview-canvas w-full rounded-lg md:rounded-xl shadow-2xl border-2 md:border-4 border-white ring-1 md:ring-2 ring-gray-200 bg-white"
-          style={{
-            aspectRatio: "1 / 1",
-            objectFit: "contain"
-          }}
         />
 
         {/* Instruction Overlay - Only when no image */}
