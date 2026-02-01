@@ -114,7 +114,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
+    <div className="min-h-screen bg-gray-50 ">
       {/* Hero Header */}
       <div className="w-full bg-gradient-to-r from-[#006a4e] via-[#007a5e] to-[#E41E3F] py-6 px-4 text-center text-white shadow-md relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
@@ -123,7 +123,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto px-4 py- md:py-8">
         {/* Mobile Layout: Preview on Top, Controls on Bottom */}
         <div className="lg:hidden space-y-6">
           {/* Preview Section - Top on Mobile */}
@@ -159,7 +159,8 @@ export default function App() {
           {/* Controls Section - Bottom on Mobile */}
           <Card className="shadow-xl border-0 overflow-hidden sticky bottom-0 z-10 bg-white">
             <div className="bg-[#E41E3F] p-4 text-white">
-              <h2 className="text-lg font-bold bengali-text">কন্ট্রোল প্যানেল</h2>
+              <h2 className="text-lg font-bold bengali-text">
+                ফ্রেম নির্বাচন করুন </h2>
             </div>
             <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
               {!uploadedImage ? (
@@ -186,7 +187,146 @@ export default function App() {
                             variant="outline"
                             onClick={handleZoomOut}
                             className="h-8 w-8 p-0"
-                          >
+                          ><div className="hidden lg:grid lg:grid-cols-12 gap-8  items-start">
+                              {/* Left Panel - Controls */}
+                              <div className="lg:col-span-6 w-full">
+                                <Card className="shadow-xl border-0 overflow-hidden sticky top-6">
+                                  <div className="bg-[#E41E3F] p-5 text-white">
+                                    <h2 className="text-xl font-bold bengali-text">
+                                      ফ্রেম নির্বাচন করুন</h2>
+                                  </div>
+                                  <div className="p-6 space-y-6">
+                                    {!uploadedImage ? (
+                                      <div className="text-center py-6">
+                                        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                        <Button onClick={() => fileInputRef.current?.click()} className="w-full bg-[#E41E3F] hover:bg-[#c41830] text-white py-7 text-lg font-semibold rounded-xl shadow-lg transition-all hover:scale-[1.02]">
+                                          <Upload className="mr-3 h-5 w-5" /> ছবি নির্বাচন করুন
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-6">
+                                        <div>
+                                          <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-2">ফ্রেম নির্বাচন করুন</h3>
+                                          <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+                                        </div>
+
+                                        <div className="space-y-5 pt-2">
+                                          <div>
+                                            <div className="flex justify-between items-center mb-2">
+                                              <label className="text-sm font-bold text-gray-700 bengali-text">জুম করুন</label>
+                                              <div className="flex items-center gap-2">
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={handleZoomOut}
+                                                  className="h-8 w-8 p-0"
+                                                >
+                                                  <ZoomOut className="h-4 w-4" />
+                                                </Button>
+                                                <span className="text-xs font-mono bg-gray-200 px-3 py-1 rounded text-gray-700 min-w-[60px] text-center">{zoom}%</span>
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={handleZoomIn}
+                                                  className="h-8 w-8 p-0"
+                                                >
+                                                  <ZoomIn className="h-4 w-4" />
+                                                </Button>
+                                              </div>
+                                            </div>
+                                            <input
+                                              type="range"
+                                              min="50"
+                                              max="400"
+                                              step="1"
+                                              value={zoom}
+                                              onChange={(e) => setZoom(Number(e.target.value))}
+                                              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]"
+                                            />
+                                            <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                              <span>50%</span>
+                                              <span>400%</span>
+                                            </div>
+                                          </div>
+
+                                          <div>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">অনুভূমিক অবস্থান (X)</label>
+                                            <input
+                                              type="range"
+                                              min="-200"
+                                              max="200"
+                                              step="1"
+                                              value={offsetX}
+                                              onChange={(e) => setOffsetX(Number(e.target.value))}
+                                              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                                            />
+                                          </div>
+
+                                          <div>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">উল্লম্ব অবস্থান (Y)</label>
+                                            <input
+                                              type="range"
+                                              min="-200"
+                                              max="200"
+                                              step="1"
+                                              value={offsetY}
+                                              onChange={(e) => setOffsetY(Number(e.target.value))}
+                                              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                                            />
+                                          </div>
+                                        </div>
+
+                                        <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-2">
+                                          <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                          <p className="text-xs text-blue-800 bengali-text leading-relaxed">টিপ: প্রিভিউতে মাউস স্ক্রোল করে জুম করুন এবং ড্র্যাগ করে সরান।</p>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3 pt-2">
+                                          <Button onClick={handleDownload} className="bg-[#E41E3F] hover:bg-[#c41830] text-white py-3 font-bold rounded-lg shadow-md transition-all hover:shadow-lg">
+                                            <Download className="mr-2 h-4 w-4" /> ডাউনলোড
+                                          </Button>
+                                          <Button onClick={handleReset} variant="outline" className="border-[#007A5E] text-[#007A5E] hover:bg-[#007A5E]/5 py-3 font-bold rounded-lg">
+                                            <RotateCcw className="mr-2 h-4 w-4" /> নতুন
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </Card>
+                              </div>
+
+                              {/* Right Panel - Preview */}
+                              <div className="lg:col-span-6 w-full">
+                                <Card className="shadow-xl border-0 overflow-hidden">
+                                  <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-5 text-white flex justify-between items-center">
+                                    <h2 className="text-xl font-bold bengali-text">প্রিভিউ</h2>
+                                    <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90">Live View</span>
+                                  </div>
+                                  <div className="bg-[#f8fafc] p-6 flex items-center justify-center min-h-[600px]">
+                                    <div
+                                      className={`w-full transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`}
+                                      onMouseDown={handleMouseDown}
+                                      onMouseMove={handleMouseMove}
+                                      onMouseUp={handleMouseUp}
+                                      onMouseLeave={handleMouseUp}
+                                      onWheel={handleWheel}
+                                      onTouchStart={handleTouchStart}
+                                      onTouchMove={handleTouchMove}
+                                      onTouchEnd={handleTouchEnd}
+                                    >
+                                      <VoteFramePreview
+                                        uploadedImage={uploadedImage}
+                                        selectedFrame={selectedFrame}
+                                        zoom={zoom}
+                                        offsetX={offsetX}
+                                        offsetY={offsetY}
+                                        canvasRef={canvasRef}
+                                      />
+                                    </div>
+                                  </div>
+                                </Card>
+                              </div>
+                            </div>
                             <ZoomOut className="h-4 w-4" />
                           </Button>
                           <span className="text-xs font-mono bg-gray-200 px-3 py-1 rounded text-gray-700 min-w-[60px] text-center">{zoom}%</span>
@@ -262,145 +402,149 @@ export default function App() {
         </div>
 
         {/* Desktop Layout: Side by Side */}
-        <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start">
-          {/* Left Panel - Controls */}
-          <div className="lg:col-span-6 w-full">
-            <Card className="shadow-xl border-0 overflow-hidden sticky top-6">
-              <div className="bg-[#E41E3F] p-5 text-white">
-                <h2 className="text-xl font-bold bengali-text">কন্ট্রোল প্যানেল</h2>
-              </div>
-              <div className="p-6 space-y-6">
-                {!uploadedImage ? (
-                  <div className="text-center py-6">
-                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    <Button onClick={() => fileInputRef.current?.click()} className="w-full bg-[#E41E3F] hover:bg-[#c41830] text-white py-7 text-lg font-semibold rounded-xl shadow-lg transition-all hover:scale-[1.02]">
-                      <Upload className="mr-3 h-5 w-5" /> ছবি নির্বাচন করুন
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-2">ফ্রেম নির্বাচন করুন</h3>
-                      <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+        <div className="px-20">
+          <div className="hidden lg:grid lg:grid-cols-12 gap-8  items-start">
+            {/* Left Panel - Controls */}
+            <div className="lg:col-span-6 w-full">
+              <Card className="shadow-xl border-0 overflow-hidden sticky top-6">
+                <div className="bg-[#E41E3F] p-5 text-white">
+                  <h2 className="text-xl font-bold bengali-text">
+                    ফ্রেম নির্বাচন করুন</h2>
+                </div>
+                <div className="p-6 space-y-6">
+                  {!uploadedImage ? (
+                    <div className="text-center py-6">
+                      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      <Button onClick={() => fileInputRef.current?.click()} className="w-full bg-[#E41E3F] hover:bg-[#c41830] text-white py-7 text-lg font-semibold rounded-xl shadow-lg transition-all hover:scale-[1.02]">
+                        <Upload className="mr-3 h-5 w-5" /> ছবি নির্বাচন করুন
+                      </Button>
                     </div>
-
-                    <div className="space-y-5 pt-2">
+                  ) : (
+                    <div className="space-y-6">
                       <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <label className="text-sm font-bold text-gray-700 bengali-text">জুম করুন</label>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleZoomOut}
-                              className="h-8 w-8 p-0"
-                            >
-                              <ZoomOut className="h-4 w-4" />
-                            </Button>
-                            <span className="text-xs font-mono bg-gray-200 px-3 py-1 rounded text-gray-700 min-w-[60px] text-center">{zoom}%</span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleZoomIn}
-                              className="h-8 w-8 p-0"
-                            >
-                              <ZoomIn className="h-4 w-4" />
-                            </Button>
+                        <h3 className="text-base font-bold text-gray-800 mb-3 bengali-text border-l-4 border-[#E41E3F] pl-2">ফ্রেম নির্বাচন করুন</h3>
+                        <FrameCarousel selectedFrame={selectedFrame} onSelectFrame={setSelectedFrame} />
+                      </div>
+
+                      <div className="space-y-5 pt-2">
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-bold text-gray-700 bengali-text">জুম করুন</label>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleZoomOut}
+                                className="h-8 w-8 p-0"
+                              >
+                                <ZoomOut className="h-4 w-4" />
+                              </Button>
+                              <span className="text-xs font-mono bg-gray-200 px-3 py-1 rounded text-gray-700 min-w-[60px] text-center">{zoom}%</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleZoomIn}
+                                className="h-8 w-8 p-0"
+                              >
+                                <ZoomIn className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <input
+                            type="range"
+                            min="50"
+                            max="400"
+                            step="1"
+                            value={zoom}
+                            onChange={(e) => setZoom(Number(e.target.value))}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>50%</span>
+                            <span>400%</span>
                           </div>
                         </div>
-                        <input
-                          type="range"
-                          min="50"
-                          max="400"
-                          step="1"
-                          value={zoom}
-                          onChange={(e) => setZoom(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#E41E3F]"
-                        />
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
-                          <span>50%</span>
-                          <span>400%</span>
+
+                        <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">অনুভূমিক অবস্থান (X)</label>
+                          <input
+                            type="range"
+                            min="-200"
+                            max="200"
+                            step="1"
+                            value={offsetX}
+                            onChange={(e) => setOffsetX(Number(e.target.value))}
+                            className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">উল্লম্ব অবস্থান (Y)</label>
+                          <input
+                            type="range"
+                            min="-200"
+                            max="200"
+                            step="1"
+                            value={offsetY}
+                            onChange={(e) => setOffsetY(Number(e.target.value))}
+                            className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
+                          />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">অনুভূমিক অবস্থান (X)</label>
-                        <input
-                          type="range"
-                          min="-200"
-                          max="200"
-                          step="1"
-                          value={offsetX}
-                          onChange={(e) => setOffsetX(Number(e.target.value))}
-                          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
-                        />
+                      <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-2">
+                        <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <p className="text-xs text-blue-800 bengali-text leading-relaxed">টিপ: প্রিভিউতে মাউস স্ক্রোল করে জুম করুন এবং ড্র্যাগ করে সরান।</p>
                       </div>
 
-                      <div>
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">উল্লম্ব অবস্থান (Y)</label>
-                        <input
-                          type="range"
-                          min="-200"
-                          max="200"
-                          step="1"
-                          value={offsetY}
-                          onChange={(e) => setOffsetY(Number(e.target.value))}
-                          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#007A5E]"
-                        />
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <Button onClick={handleDownload} className="bg-[#E41E3F] hover:bg-[#c41830] text-white py-3 font-bold rounded-lg shadow-md transition-all hover:shadow-lg">
+                          <Download className="mr-2 h-4 w-4" /> ডাউনলোড
+                        </Button>
+                        <Button onClick={handleReset} variant="outline" className="border-[#007A5E] text-[#007A5E] hover:bg-[#007A5E]/5 py-3 font-bold rounded-lg">
+                          <RotateCcw className="mr-2 h-4 w-4" /> নতুন
+                        </Button>
                       </div>
                     </div>
-
-                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-2">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      <p className="text-xs text-blue-800 bengali-text leading-relaxed">টিপ: প্রিভিউতে মাউস স্ক্রোল করে জুম করুন এবং ড্র্যাগ করে সরান।</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-2">
-                      <Button onClick={handleDownload} className="bg-[#E41E3F] hover:bg-[#c41830] text-white py-3 font-bold rounded-lg shadow-md transition-all hover:shadow-lg">
-                        <Download className="mr-2 h-4 w-4" /> ডাউনলোড
-                      </Button>
-                      <Button onClick={handleReset} variant="outline" className="border-[#007A5E] text-[#007A5E] hover:bg-[#007A5E]/5 py-3 font-bold rounded-lg">
-                        <RotateCcw className="mr-2 h-4 w-4" /> নতুন
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          </div>
-
-          {/* Right Panel - Preview */}
-          <div className="lg:col-span-6 w-full">
-            <Card className="shadow-xl border-0 overflow-hidden">
-              <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-5 text-white flex justify-between items-center">
-                <h2 className="text-xl font-bold bengali-text">প্রিভিউ</h2>
-                <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90">Live View</span>
-              </div>
-              <div className="bg-[#f8fafc] p-6 flex items-center justify-center min-h-[600px]">
-                <div
-                  className={`w-full transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`}
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
-                  onWheel={handleWheel}
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  <VoteFramePreview
-                    uploadedImage={uploadedImage}
-                    selectedFrame={selectedFrame}
-                    zoom={zoom}
-                    offsetX={offsetX}
-                    offsetY={offsetY}
-                    canvasRef={canvasRef}
-                  />
+                  )}
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
+
+            {/* Right Panel - Preview */}
+            <div className="lg:col-span-6 w-full">
+              <Card className="shadow-xl border-0 overflow-hidden">
+                <div className="bg-gradient-to-r from-[#007A5E] to-[#1B5E20] p-3 text-white flex justify-between items-center">
+                  <h2 className="text-xl font-bold bengali-text">প্রিভিউ</h2>
+
+                </div>
+                <div className="bg-[#f8fafc] p-3 flex items-center justify-center min-h-[600px]">
+                  <div
+                    className={`w-full transition-transform duration-75 ${uploadedImage ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-default"}`}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onWheel={handleWheel}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    <VoteFramePreview
+                      uploadedImage={uploadedImage}
+                      selectedFrame={selectedFrame}
+                      zoom={zoom}
+                      offsetX={offsetX}
+                      offsetY={offsetY}
+                      canvasRef={canvasRef}
+                    />
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         </div>
+
       </div>
 
       <div className="bg-[#1B5E20] text-white text-center py-8 mt-8 border-t-4 border-[#E41E3F]">

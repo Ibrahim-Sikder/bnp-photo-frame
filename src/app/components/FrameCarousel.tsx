@@ -33,6 +33,27 @@ export default function FrameCarousel({ selectedFrame, onSelectFrame }: FrameCar
       id: "frame5" as const,
       imageUrl: "/frames/frame5.png",
     },
+    {
+      id: "frame6" as const,
+      imageUrl: "/frames/frame5.png",
+    },
+    {
+      id: "frame7" as const,
+      imageUrl: "/frames/frame4.png",
+    },
+    {
+      id: "frame8" as const,
+      imageUrl: "/frames/frame5.png",
+    },
+    {
+      id: "frame9" as const,
+      imageUrl: "/frames/frame5.png",
+    },
+    {
+      id: "frame10" as const,
+      imageUrl: "/frames/frame5.png",
+    },
+
   ];
 
   const updateScrollButtons = () => {
