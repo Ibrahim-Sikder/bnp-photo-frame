@@ -531,7 +531,7 @@ export default function App() {
       {/* Footer */}
       <div className="bg-gradient-to-r from-[#1B5E20] to-[#0d3f16] text-white text-center py-4 md:py-6 mt-6 md:mt-8 border-t-4 border-[#E41E3F] shadow-lg">
         <p className="bengali-text font-semibold opacity-95 text-sm md:text-lg">© ২০২৬ বাংলাদেশ জাতীয়তাবাদী দল (বিএনপি)</p>
-        <p className="text-xs opacity-70 mt-1">সর্বস্বত্ব সংরক্ষিত | World's Best Frame Generator 🌟</p>
+        <p className="text-xs opacity-70 mt-1">সর্বস্বত্ব সংরক্ষিত</p>
       </div>
     </div>
   );
